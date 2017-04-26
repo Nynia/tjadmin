@@ -22,7 +22,7 @@ class TestingConfig(Config):
 class ProductionConfig(Config):
     SQLALCHEMY_BINDS = {
         'jstelecom': 'mysql://ismpadmin:admin123@202.102.41.186/jstelecom',
-        'ora11g': 'mysql://root:admin@182.168.127.53/ora11g'
+        'ora11g': 'mysql://root:admin@192.168.127.53/ora11g'
     }
 
 config = {
