@@ -13,13 +13,14 @@ class Config:
 
 class TestingConfig(Config):
     TESTING = True
-    #SQLALCHEMY_DATABASE_URI = 'mysql://root:admin@127.0.0.1/ora11g'
+    SQLALCHEMY_DATABASE_URI = 'mysql://root:admin@127.0.0.1/ora11g'
     SQLALCHEMY_BINDS = {
         'jstelecom': 'mysql://ismpadmin:admin123@202.102.41.186/jstelecom',
         'ora11g': 'mysql://root:admin@127.0.0.1/ora11g'
     }
 
 class ProductionConfig(Config):
+    SQLALCHEMY_DATABASE_URI = 'mysql://root:admin@127.0.0.1/ora11g'
     SQLALCHEMY_BINDS = {
         'jstelecom': 'mysql://ismpadmin:admin123@202.102.41.186/jstelecom',
         'ora11g': 'mysql://root:admin@192.168.127.53/ora11g'
@@ -29,5 +30,5 @@ config = {
     'testing': TestingConfig,
     'production': ProductionConfig,
 
-    'default':ProductionConfig,
+    'default':TestingConfig,
 }
