@@ -20,11 +20,14 @@ class TestingConfig(Config):
     }
 
 class ProductionConfig(Config):
-    SQLALCHEMY_DATABASE_URI = 'mysql://root:admin@192.168.114.139/havefun'
+    SQLALCHEMY_BINDS = {
+        'jstelecom': 'mysql://root:admin@127.0.0.1/jstelecom',
+        'ora11g': 'mysql://root:admin@182.168.127.53/ora11g'
+    }
 
 config = {
     'testing': TestingConfig,
     'production': ProductionConfig,
 
-    'default':TestingConfig,
+    'default':ProductionConfig,
 }
