@@ -62,7 +62,7 @@ class USER(db.Model):
 class SPINFO(db.Model):
     __tablename__ = 'focused_sp_info'
     __bind_key__ = 'ora11g'
-    id = db.Column(db.Integer,primary_key=True)
+    spid = db.Column(db.String(10),primary_key=True)
     spname = db.Column(db.String(255))
     accessno = db.Column(db.String(15))
 
@@ -71,7 +71,7 @@ class SPINFO(db.Model):
 
     def to_json(self):
         json_post = {
-            'id':self.id,
+            'id':self.spid,
             'spname':self.spname,
             'accessno':self.accessno
         }
