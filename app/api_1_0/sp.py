@@ -28,7 +28,7 @@ def add_new_sp():
 
     if not SPINFO.query.get(int(id)):
         spinfo = SPINFO()
-        spinfo.id = id
+        spinfo.spid = id
         spinfo.spname = name
         spinfo.accessno = accessno
 
