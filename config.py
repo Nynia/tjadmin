@@ -15,7 +15,7 @@ class TestingConfig(Config):
     TESTING = True
     SQLALCHEMY_DATABASE_URI = 'mysql://root:admin@127.0.0.1/ismp'
     SQLALCHEMY_BINDS = {
-        'jstelecom': 'mysql://ismpadmin:admin123@202.102.41.186/jstelecom',
+        'jstelecom': 'mysql://root:admin@127.0.0.1/jstelecom',
         'ora11g': 'mysql://root:admin@127.0.0.1/ora11g'
     }
 

@@ -60,7 +60,7 @@ class USER(db.Model):
         return json_post
 
 class SPINFO(db.Model):
-    __tablename__ = 'sp_info'
+    __tablename__ = 'focused_sp_info'
     __bind_key__ = 'ora11g'
     id = db.Column(db.Integer,primary_key=True)
     spname = db.Column(db.String(255))
