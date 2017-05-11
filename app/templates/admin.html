@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <title>黑名单管理系统</title>
+
+    <!-- Bootstrap -->
+    <link href="../static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../static/css/style.css" rel="stylesheet">
+
+</head>
+<body>
+<!-- Modal -->
+<div class="modal fade" id="addmodal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">手动添加</h4>
+            </div>
+            <div class="modal-body">
+                <form action="/admin" method="post">
+                    {{ singleaddform.hidden_tag() }}
+                    <div class="form-group">
+                        {{ singleaddform.number.label }}{{ singleaddform.number(class="form-control") }}
+                    </div>
+                    <div class="form-group">
+                        {{ singleaddform.type.label }}{{ singleaddform.type(class="form-control") }}
+                    </div>
+                    <div class="form-group">
+                        {{ singleaddform.remark.label }}{{ singleaddform.remark(class="form-control") }}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default cancel">取消</button>
+                        {{ singleaddform.submit(class="btn btn-primary") }}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal -->
+<div class="modal fade" id="uploadmodal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">从文件中导入</h4>
+            </div>
+            <div class="modal-body">
+                <form action="/admin" method="post" enctype=multipart/form-data>
+                    {{ uploadform.hidden_tag() }}
+                    <div class="form-group">
+                        {{ uploadform.blackfile.label }}{{ uploadform.blackfile(multiple="multiple",accept="text/plain") }}
+                        <div class="form-group">
+                            {{ uploadform.type.label }}{{ uploadform.type(class="form-control") }}
+                        </div>
+                        <div class="form-group">
+                            {{ uploadform.remark.label }}{{ uploadform.remark(class="form-control") }}
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default cancel">取消</button>
+                        {{ uploadform.submit(class="btn btn-primary") }}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="filtermodal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">黑名单过滤</h4>
+            </div>
+            <div class="modal-body">
+                <form action="/admin" method="post" enctype=multipart/form-data>
+                    {{ filterform.hidden_tag() }}
+                    <div class="form-group">
+                        {{ filterform.sourcefile.label }}{{ filterform.sourcefile(multiple="multiple",accept="text/plain") }}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default cancel">取消</button>
+                        {{ filterform.submit(class="btn btn-primary") }}
+                    </div>
+                </form>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<div class="container">
+    <div class="row">
+        <div class="input-group col-md-12" style="margin-top:0;positon:relative">
+            <input type="text" id="searchnum" class="form-control" placeholder="请输入号码"/>
+            <span class="input-group-btn">
+                <button class="btn btn-info btn-search" id="search">查询</button>
+                <button class="btn btn-info btn-search" id="addone">手动添加</button>
+                <button class="btn btn-info btn-search" id="importfromfile">从文件导入</button>
+                <button class="btn btn-info btn-search" id="exporttofile">导出到文件</button>
+                <button class="btn btn-info btn-search" id="filter">黑名单过滤</button>
+            </span>
+        </div>
+    </div>
+    <div>
+        <p>当前库中共有{{ totalcount }}个黑名单号码</p>
+    </div>
+    {% for message in get_flashed_messages() %}
+        <div class="alert alert-warning" id="flash">
+            {{ message }}
+        </div>
+    {% endfor %}
+    {% if blackitem %}
+        <div class="row margintop50">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>号码</th>
+                    <th>类型</th>
+                    <th>添加方式</th>
+                    <th>添加人</th>
+                    <th>添加时间</th>
+                    <th>备注信息</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr class="tr_user">
+                    <td>{{ blackitem.id }}</td>
+                    <td>
+                        {% if blackitem.type == '1' %}黑名单
+                        {% else %}红名单
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if blackitem.create_mode == '1' %}手动添加
+                        {% else %}批量导入
+                        {% endif %}
+                    </td>
+                    <td>{{ blackitem.create_person }}</td>
+                    <td>{{ blackitem.createtime }}</td>
+                    <td>{{ blackitem.remark }}</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+</div>
+<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+<script src="../static/js/jquery-3.2.1.min.js"></script>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="../static/js/bootstrap.min.js"></script>
+
+<script>
+    $('#addone').click(function () {
+        $('#addmodal').modal('show');
+    });
+    $('#importfromfile').click(function () {
+        $('#uploadmodal').modal('show');
+    });
+    $('#exporttofile').click(function () {
+        window.location.href = '/export'
+    });
+    $('#filter').click(function () {
+        $('#filtermodal').modal('show')
+    });
+    $('#search').click(function () {
+        $('#flash').html('');
+        var number = $('#searchnum').val();
+        window.location.href = 'admin?blacksearch=' + number;
+    });
+    $('#addmodal .cancel').click(function () {
+        $('#addmodal').modal('hide');
+    });
+    $('#uploadmodal button').click(function () {
+        $('#uploadmodal').modal('hide');
+    });
+    $('#filtermodal button').click(function () {
+        $('#filtermodal').modal('hide');
+    });
+</script>
+</body>
+</html>

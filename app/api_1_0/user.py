@@ -38,7 +38,6 @@ def update_user():
         'data': user.to_json()
     })
 
-
 @api.route('/user/<id>', methods=['DELETE'])
 def delete_user_by_id(id):
     user = USER.query.get(int(id))

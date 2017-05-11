@@ -1,42 +1,7 @@
 from app import db
-
-class CPUSER(db.Model):
-    __tablename__ = 'cp_user'
-    __bind_key__ = 'jstelecom'
-
-    cp_id = db.Column(db.Integer,primary_key=True)
-    cp_name = db.Column(db.String(32))
-    cp_access_num = db.Column(db.String(50))
-    cp_company_name = db.Column(db.String(100))
-    cp_company_addr = db.Column(db.String(150))
-    cp_status_update_url = db.Column(db.String(150))
-    createtime = db.Column(db.DateTime)
-    verify_status = db.Column(db.Integer)
-    sp_id = db.Column(db.String(10))
-
-
-    def __repr__(self):
-        return '<CPUSER %r>' % self.cp_name
-
-class PRODUCTINFO(db.Model):
-    __tablename__ = 'product_info'
-    __bind_key__ = 'jstelecom'
-
-    product_id = db.Column(db.Integer, primary_key=True)
-    cp_id = db.Column(db.Integer)
-    ismp_product_id = db.Column(db.String(30))
-    ismp_business_id = db.Column(db.String(30))
-    access_num = db.Column(db.String(10))
-    product_name = db.Column(db.String(32))
-    order_string = db.Column(db.String(32))
-    td_orderstring = db.Column(db.String(32))
-    orderstring_type = db.Column(db.Integer)
-    price = db.Column(db.Integer)
-    verify_status = db.Column(db.Integer)
-    createtime = db.Column(db.DateTime)
-
-    def __repr__(self):
-        return '<PRODUCTINFO %r>' % self.product_id
+from werkzeug.security import generate_password_hash, check_password_hash
+from . import login_manager
+from flask_login import UserMixin
 
 class USER(db.Model):
     __tablename__ = 'user'
@@ -87,3 +52,64 @@ class FOCUSPRODUCT(db.Model):
 
     def __repr__(self):
         return '<FOCUSPRODUCT %r>' % self.servicename
+
+class BLACKLIST(db.Model):
+    __tablename__ = 'black_list'
+    id = db.Column(db.String(15),primary_key=True)
+    remark = db.Column(db.String(255))
+    createtime = db.Column(db.String(14))
+    state = db.Column(db.String(1))
+    type = db.Column(db.String(1))
+    create_mode = db.Column(db.String(1))
+    create_person = db.Column(db.String(255))
+
+    def __repr__(self):
+        return '<BLACKLIST %r>' % self.id
+
+    def to_json(self):
+        json_post = {
+            'id':self.id,
+            'remark':self.remark,
+            'createtime':self.createtime,
+            'state':self.state,
+            'type':self.type,
+            'create_mode':self.create_mode,
+            'create_person':self.create_person
+        }
+        return json_post
+
+class BlACKUSER(UserMixin, db.Model):
+    __tablename__ = 'user_info'
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(255))
+    password_hash = db.Column(db.String(255))
+    createtime = db.Column(db.String(255))
+
+    def __repr__(self):
+        return '<USER %s>' % self.username
+
+    def to_json(self):
+        json_post = {
+            'id': self.id,
+            'username':self.username,
+            'createtime':self.createtime
+        }
+        return json_post
+    @property
+    def password(self):
+        raise AttributeError('password is not a readable attribute')
+
+    @password.setter
+    def password(self, password):
+        self.password_hash = generate_password_hash(password)
+
+    def verify_password(self, password):
+        return check_password_hash(self.password_hash, password)
+
+    def get_id(self):
+        return self.id
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    return BlACKUSER.query.get(int(user_id))
