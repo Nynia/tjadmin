@@ -19,7 +19,7 @@ class TestingConfig(Config):
     }
 
 class ProductionConfig(Config):
-    SQLALCHEMY_DATABASE_URI = 'mysql://root:admin@127.0.0.1/ismp'
+    SQLALCHEMY_DATABASE_URI = 'mysql://root:admin@127.0.0.1/black'
     SQLALCHEMY_BINDS = {
         'ora11g': 'mysql://root:admin@192.168.127.53/ora11g'
     }
@@ -28,5 +28,5 @@ config = {
     'testing': TestingConfig,
     'production': ProductionConfig,
 
-    'default':TestingConfig,
+    'default':ProductionConfig,
 }
