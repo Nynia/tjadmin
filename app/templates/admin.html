@@ -111,9 +111,7 @@
             </span>
         </div>
     </div>
-    <div>
-        <p>当前库中共有{{ totalcount }}个黑名单号码</p>
-    </div>
+        <p><strong>当前库中共有{{ totalcount }}个黑名单号码</strong></p>
     {% for message in get_flashed_messages() %}
         <div class="alert alert-warning" id="flash">
             {{ message }}
