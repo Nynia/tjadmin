@@ -153,7 +153,7 @@ def admin():
                     if match:
                         number = match.string
                 if not BLACKLIST.query.get(number):
-                    download_file.write(item + '\r\n')
+                    download_file.write(item)
                 else:
                     filter_count += 1
             flash(u'过滤成功，共过滤黑名单号码%d个' % filter_count)
