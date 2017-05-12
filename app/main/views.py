@@ -166,9 +166,9 @@ def admin():
         if not blackitem:
             flash(u'此号码不在黑名单库中')
     elif request.args.get('filter'):
-        print repr(str(request.args.get('filter')))
+        #print repr(str(request.args.get('filter')))
         filename = urllib.unquote(str(request.args.get('filter')))
-        print repr(filename)
+        #print repr(filename)
         filter_path = '..' + os.sep+'res' + os.sep + filename.decode('utf-8')
         response = make_response(send_file(filter_path))
         response.headers["Content-Disposition"] = "attachment; filename=%s;" % filename
