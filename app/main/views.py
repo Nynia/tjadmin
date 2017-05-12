@@ -53,6 +53,7 @@ def admin():
             success_count = 0
             fail_count = 0
             repeat_count = 0
+            illegal_numbers = ''
             illegal_fp = open('./res/illegal.txt','w+')
             for file in request.files.getlist('blackfile'):
                 filename = hashlib.md5(secure_filename(file.filename) + str(time.time())).hexdigest()[:15]
@@ -62,6 +63,8 @@ def admin():
                 remark = uploadform.remark.data
                 for item in fp.readlines():
                     number = item.strip()
+                    if number == '':
+                        continue
                     match = phone_pattern.match(number)
                     if match:
                         number = match.group(2)
@@ -71,6 +74,7 @@ def admin():
                             number = match.group(1)+match.group(2)
                         else:
                             illegal_fp.write(number+'\n')
+                            illegal_numbers += number + ';'
                             fail_count += 1
                             continue
                     if not BLACKLIST.query.get(number):
@@ -89,6 +93,7 @@ def admin():
                 fp.close()
             uploadform.remark.data = ''
             flash((u'成功导入%d个黑名单号码，重复号码%d个，非法号码%d个') % (success_count,repeat_count,fail_count))
+            flash((u'非法号码列表如下：%s') % illegal_numbers)
             illegal_fp.close()
             db.session.commit()
             return redirect(url_for('main.admin'))
