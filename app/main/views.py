@@ -1,10 +1,10 @@
 # -*-coding=utf-8-*-
 from . import main
 from app.models import USER,FOCUSPRODUCT,SPINFO,BLACKLIST,BlACKUSER
-from flask import render_template,request,flash,make_response,redirect,url_for,jsonify
+from flask import render_template,request,flash,make_response,redirect,url_for,jsonify,send_file
 from werkzeug.utils import secure_filename
 from .form import UploadForm,SingleAddForm,FilterForm
-import os,hashlib,time,re,datetime
+import os,hashlib,time,re,datetime,urllib
 from app import db
 from flask_login import login_required,current_user
 
@@ -46,8 +46,8 @@ def admin():
 
     blacklist = BLACKLIST.query.all()
     if request.method == 'POST':
-        phone_pattern = re.compile('\+?(86)?((173|177|180|181|189|133|153|170|149)\d{8}$)')
-        tel_parttern = re.compile('^(0\d{2,3})-?(\d{8})')
+        phone_pattern = re.compile('(86)?((173|177|180|181|189|133|153|170|149)\d{8}$)')
+        tel_parttern = re.compile('0\d{10,11}')
         create_person = BlACKUSER.query.get(int(current_user.id)).username
         if uploadform.validate_on_submit():
             success_count = 0
@@ -62,7 +62,7 @@ def admin():
                 type = '1' if uploadform.type.data == 'black' else '2'
                 remark = uploadform.remark.data
                 for item in fp.readlines():
-                    number = item.strip()
+                    number = filter(str.isdigit, item.strip())
                     if number == '':
                         continue
                     match = phone_pattern.match(number)
@@ -71,7 +71,7 @@ def admin():
                     else:
                         match = tel_parttern.match(number)
                         if match:
-                            number = match.group(1)+match.group(2)
+                            number = match.string
                         else:
                             illegal_fp.write(number+'\n')
                             illegal_numbers += number + ';'
@@ -93,7 +93,7 @@ def admin():
                 fp.close()
             uploadform.remark.data = ''
             flash((u'成功导入%d个黑名单号码，重复号码%d个，非法号码%d个') % (success_count,repeat_count,fail_count))
-            flash((u'非法号码列表如下：%s') % illegal_numbers)
+            flash((u'非法号码列表：%s') % illegal_numbers)
             illegal_fp.close()
             db.session.commit()
             return redirect(url_for('main.admin'))
@@ -103,7 +103,7 @@ def admin():
             repeat_count = 0
             data = singleaddform.number.data
             for number in re.split('[,;\n]',data):
-                number = number.strip()
+                number = filter(str.isdigit, number.strip())
 
                 match = phone_pattern.match(number)
                 if match:
@@ -111,7 +111,7 @@ def admin():
                 else:
                     match = tel_parttern.match(number)
                     if match:
-                        number = match.group(1) + match.group(2)
+                        number = match.string
                     else:
                         #flash(u'%s 添加失败，号码不符合规范或者非电信号码' % number)
                         fail_count += 1
@@ -144,30 +144,35 @@ def admin():
             fp = open('./res/' + filename, 'r')
             download_file = open('./res/'+download_name, 'w+')
             for item in fp.readlines():
-                number = item.strip()
-                phone_pattern = re.compile('\+?(86)?((173|177|180|181|189|133|153|170|149)\d{8}$)')
-                tel_parttern = re.compile('^(0\d{2,3})-?(\d{8})')
-
+                number = filter(str.isdigit, item.strip())
                 match = phone_pattern.match(number)
                 if match:
                     number = match.group(2)
                 else:
                     match = tel_parttern.match(number)
                     if match:
-                        number = match.group(1) + match.group(2)
+                        number = match.string
                 if not BLACKLIST.query.get(number):
-                    download_file.write(item+'\r\n')
+                    download_file.write(item + '\r\n')
                 else:
                     filter_count += 1
             flash(u'过滤成功，共过滤黑名单号码%d个' % filter_count)
-            download_file.close()
             fp.close()
             db.session.commit()
-            return redirect(url_for('main.admin'))
+            download_file.close()
+            return redirect(url_for('main.admin',filter=urllib.quote(download_name.encode('utf-8'))))
     elif request.args.get('blacksearch'):
         blackitem = BLACKLIST.query.get(request.args.get('blacksearch').strip())
         if not blackitem:
             flash(u'此号码不在黑名单库中')
+    elif request.args.get('filter'):
+        print repr(str(request.args.get('filter')))
+        filename = urllib.unquote(str(request.args.get('filter')))
+        print repr(filename)
+        filter_path = '..' + os.sep+'res' + os.sep + filename.decode('utf-8')
+        response = make_response(send_file(filter_path))
+        response.headers["Content-Disposition"] = "attachment; filename=%s;" % filename
+        return response
     return render_template('admin.html', uploadform=uploadform,singleaddform=singleaddform,filterform=filterform,blackitem=blackitem,totalcount=len(blacklist))
 
 @main.route('/export', methods=['GET'])
