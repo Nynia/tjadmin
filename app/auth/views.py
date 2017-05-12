@@ -15,6 +15,7 @@ def login():
         print form.username.data
         if user is not None and user.verify_password(form.password.data):
             login_user(user)
+            print url_for('main.admin')
             return redirect(url_for('main.admin'))
         flash(u'用户名或密码错误')
         print 'password error'

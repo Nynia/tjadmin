@@ -46,6 +46,8 @@ def admin():
 
     blacklist = BLACKLIST.query.all()
     if request.method == 'POST':
+        phone_pattern = re.compile('\+?(86)?((173|177|180|181|189|133|153|170|149)\d{8}$)')
+        tel_parttern = re.compile('^(0\d{2,3})-?(\d{8})')
         create_person = BlACKUSER.query.get(int(current_user.id)).username
         if uploadform.validate_on_submit():
             success_count = 0
@@ -60,9 +62,6 @@ def admin():
                 remark = uploadform.remark.data
                 for item in fp.readlines():
                     number = item.strip()
-                    phone_pattern = re.compile('\+?(86)?((173|177|180|181|189|133|153|170|149)\d{8}$)')
-                    tel_parttern = re.compile('^(0\d{2,3})-?(\d{8})')
-
                     match = phone_pattern.match(number)
                     if match:
                         number = match.group(2)
@@ -86,7 +85,6 @@ def admin():
                         db.session.add(blackitem)
                         success_count += 1
                     else:
-                        print number
                         repeat_count += 1
                 fp.close()
             uploadform.remark.data = ''
@@ -101,8 +99,6 @@ def admin():
             data = singleaddform.number.data
             for number in re.split('[,;\n]',data):
                 number = number.strip()
-                phone_pattern = re.compile('\+?(86)?((173|177|180|181|189|133|153|170|149)\d{8}$)')
-                tel_parttern = re.compile('^(0\d{2,3})-?(\d{8})')
 
                 match = phone_pattern.match(number)
                 if match:
