@@ -53,6 +53,7 @@
                 <h4 class="modal-title">从文件中导入</h4>
             </div>
             <div class="modal-body">
+                <p style="color:red;font-weight:bold;">请上传TXT格式文件，文件中每行一条数据,可同时上传多个文件</p>
                 <form action="/admin" method="post" enctype=multipart/form-data>
                     {{ uploadform.hidden_tag() }}
                     <div class="form-group">
