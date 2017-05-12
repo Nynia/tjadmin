@@ -11,6 +11,8 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         user = BlACKUSER.query.filter_by(username=form.username.data).first()
+        print user
+        print form.username.data
         if user is not None and user.verify_password(form.password.data):
             login_user(user)
             return redirect(url_for('main.admin'))
