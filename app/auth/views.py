@@ -17,7 +17,6 @@ def login():
             login_user(user)
             print url_for('main.admin')
             return redirect(url_for('main.admin'))
-        flash(u'用户名或密码错误')
         print 'password error'
         form.username.data = ''
         form.password.data = ''
