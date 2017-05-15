@@ -47,7 +47,7 @@ def admin():
     blacklist = BLACKLIST.query.all()
     if request.method == 'POST':
         phone_pattern = re.compile('(86)?((173|177|180|181|189|133|153|170|149)\d{8}$)')
-        tel_parttern = re.compile('^0\d{10,11}$')
+        tel_parttern = re.compile('^(0(25|510|516|519|512|513|518|517|515|514|511|523||527)\d{8}$)')
         create_person = BlACKUSER.query.get(int(current_user.id)).username
         if uploadform.validate_on_submit():
             success_count = 0
@@ -71,12 +71,13 @@ def admin():
                     else:
                         match = tel_parttern.match(number)
                         if match:
-                            number = match.string
+                            number = match.group(1)
                         else:
                             illegal_fp.write(number+'\n')
                             illegal_numbers += number + ';'
                             fail_count += 1
                             continue
+                    #print number
                     if not BLACKLIST.query.get(number):
                         blackitem = BLACKLIST()
                         blackitem.id = number
@@ -110,7 +111,7 @@ def admin():
                 else:
                     match = tel_parttern.match(number)
                     if match:
-                        number = match.string
+                        number = match.group(1)
                     else:
                         #flash(u'%s 添加失败，号码不符合规范或者非电信号码' % number)
                         fail_count += 1
@@ -150,7 +151,7 @@ def admin():
                 else:
                     match = tel_parttern.match(number)
                     if match:
-                        number = match.string
+                        number = match.group(1)
                 if not BLACKLIST.query.get(number):
                     download_file.write(item)
                 else:
