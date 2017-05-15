@@ -83,7 +83,7 @@ def admin():
                         blackitem.createtime = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
                         blackitem.state = '1'
                         blackitem.type = type
-                        blackitem.remark = remark
+                        blackitem.remark = remark if remark else '无'
                         blackitem.create_person = create_person
                         blackitem.create_mode = '2'
                         db.session.add(blackitem)
@@ -103,8 +103,7 @@ def admin():
             repeat_count = 0
             data = singleaddform.number.data
             for number in re.split('[,;\n]',data):
-                number = filter(str.isdigit, number.strip())
-
+                number = filter(str.isdigit, str(number.strip()))
                 match = phone_pattern.match(number)
                 if match:
                     number = match.group(2)
@@ -122,7 +121,7 @@ def admin():
                     blackitem.createtime = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
                     blackitem.state = '1'
                     blackitem.type = '1' if singleaddform.type.data == 'black' else '2'
-                    blackitem.remark = singleaddform.remark.data
+                    blackitem.remark = singleaddform.remark.data if singleaddform.remark.data else u'无'
                     blackitem.create_person = create_person
                     blackitem.create_mode = '1'
                     db.session.add(blackitem)

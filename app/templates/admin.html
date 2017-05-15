@@ -122,7 +122,7 @@
     {% endfor %}
     {% if blackitem %}
         <div class="row margintop50">
-            <table class="table">
+            <table class="table table-bordered">
                 <thead>
                 <tr>
                     <th>号码</th>
@@ -147,7 +147,7 @@
                         {% endif %}
                     </td>
                     <td>{{ blackitem.create_person }}</td>
-                    <td>{{ blackitem.createtime }}</td>
+                    <td>{{ blackitem.createtime[:4] }}-{{ blackitem.createtime[4:6] }}-{{ blackitem.createtime[6:8] }} {{ blackitem.createtime[8:10] }}:{{ blackitem.createtime[10:12] }}</td>
                     <td>{{ blackitem.remark }}</td>
                 </tr>
                 </tbody>

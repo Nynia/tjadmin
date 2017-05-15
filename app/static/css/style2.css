@@ -1,0 +1,113 @@
+*{
+	padding: 0;
+	margin: 0;
+	box-sizing: border-box;
+}
+a{
+	color: #000;
+	text-decoration: none;
+}
+ul,li{
+	list-style: none;
+}
+.clear{
+	clear: both;
+}
+body{
+	background: url(../img/bg.png)  no-repeat center center fixed;
+	-webkit-background-size:cover;
+    -moz-background-size:cover;
+    -o-background-size:cover;
+    background-size:cover;
+	font-family: "微软雅黑";
+}
+.title{
+	margin: 182px auto 0;
+	width: 617x;
+	text-align: center;
+	font-size: 36px;
+	color: #fff;
+}
+main{
+	width: 617px;
+	margin: 40px auto 0;
+	height: 304px;
+	border: 2px solid #9edcdb;
+	border-radius: 5px;
+	text-align: center;
+}
+.main{
+	background: url(../img/bg_m.png) no-repeat;
+	width: 100%;
+	height: 100%;
+	margin-top: 6px;
+	margin-left: 6px;
+	position: relative;
+}
+.main form{
+	position: absolute;
+	top: 87px;
+	right: 30px;
+}
+form li{
+	display: block;
+	height: 25px;
+}
+.fl{
+	float: left;
+}
+.l-ico{
+	font-size: 15.98px;
+	line-height: 25px;
+	color: #053d85;
+}
+form li input{
+	height: 25px;
+	line-height: 25px;
+	width: 184px;
+	border: 2px solid #bacad4;
+}
+form ul li:nth-child(2){
+	margin-top: 23px;
+}
+input[type="submit"]{
+	outline: none;
+	margin-top: 36px;
+	width: 91px;
+	height: 38px;
+	line-height: 38px;
+	background: #1d64af;
+	border: 1px solid #1D64AF;
+	color: #fff;
+	font-size: 15.98px;
+	cursor: pointer;
+	float: right;
+	margin-right: 48px;
+	border-radius: 5px;
+}
+/*媒体查询*/
+@media only screen and (min-width:1024px ){
+	.title{
+		margin-top: 129px;
+	}
+}
+@media only screen and (min-width:1280px ){
+	.title{
+		margin-top: 126px;
+	}
+}
+@media only screen and (min-width:1366px ){
+	.title{
+		margin-top: 129px;
+	}
+}
+@media only screen and (min-width:1440px ){
+	.title{
+		margin-top: 151.67px;
+	}
+}
+@media only screen and (min-width:1680px ){
+	.title{
+		margin-top: 176.94444px;
+	}
+}
