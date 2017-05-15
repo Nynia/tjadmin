@@ -47,7 +47,7 @@ def admin():
     blacklist = BLACKLIST.query.all()
     if request.method == 'POST':
         phone_pattern = re.compile('(86)?((173|177|180|181|189|133|153|170|149)\d{8}$)')
-        tel_parttern = re.compile('0\d{10,11}')
+        tel_parttern = re.compile('^0\d{10,11}$')
         create_person = BlACKUSER.query.get(int(current_user.id)).username
         if uploadform.validate_on_submit():
             success_count = 0
