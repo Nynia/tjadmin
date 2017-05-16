@@ -4,7 +4,7 @@ from app.models import BLACKLIST,BlACKUSER
 import re,datetime
 
 @celery.task
-def datahandle(filenames, type, remark, current_user):
+def datahandle(filenames, type, remark, create_person):
     phone_pattern = re.compile('(86)?((173|177|180|181|189|133|153|170|149)\d{8}$)')
     tel_parttern = re.compile('^(0(25|510|516|519|512|513|518|517|515|514|511|523||527)\d{8}$)')
 
@@ -12,7 +12,6 @@ def datahandle(filenames, type, remark, current_user):
     fail_count = 0
     repeat_count = 0
     illegal_numbers = ''
-    create_person = BlACKUSER.query.get(int(current_user.id)).username
 
     for filename in filenames:
         fp = open('./res/' + filename, 'r')

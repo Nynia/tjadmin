@@ -62,7 +62,7 @@ def admin():
                 filename = hashlib.md5(secure_filename(file.filename) + str(time.time())).hexdigest()[:15]
                 file.save(os.path.join('./res/', filename))
                 filenames.append(filename)
-            datahandle.delay(filenames,type,remark,current_user)
+            datahandle.delay(filenames,type,remark,create_person)
             flash(u'正在处理...')
             return redirect(url_for('main.admin'))
             #     fp = open('./res/'+filename,'r')
