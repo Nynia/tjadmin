@@ -121,7 +121,7 @@
         </div>
     </div>
     <p><strong>当前库中共有{{ totalcount }}个黑名单号码</strong></p>
-    <input type="text" id="weiyi">
+    <p id="weiyi"></p>
     {% for message in get_flashed_messages() %}
         <div class="alert alert-warning" id="flash">
             {{ message }}
@@ -209,7 +209,7 @@
             success: function (data, status, request) {
                 status_url = request.getResponseHeader('Location');
                 console.log(status_url);
-                $('#weiyi').val(status_url);
+                $('#weiyi').text(status);
                 update_progress(status_url.substr(status_url.lastIndexOf('/')));
             },
             error: function () {
@@ -218,7 +218,7 @@
         });
     });
     $('#test').click(function () {
-        var status_url = $('#weiyi').val();
+        var status_url = $('#weiyi').text();
         $.ajax({
             url: status_url,
             type: 'GET',
