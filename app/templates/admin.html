@@ -196,6 +196,7 @@
     });
     $('#import-button').click(function (event) {
         event.preventDefault();
+        $('#uploadmodal').modal('hide');
         var formData = new FormData($('#import-form')[0]);
         $.ajax({
             url: '/upload',
@@ -217,7 +218,7 @@
                 alert('Unexpected error');
             }
         });
-        $('#uploadmodal').modal('hide');
+
     });
     $('#test').click(function () {
         var status_url = $('#weiyi').text();
