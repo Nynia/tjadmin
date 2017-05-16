@@ -204,13 +204,13 @@
             beforeSend: function () {
                 console.log("正在进行，请稍候");
             },
-            success: function (responseStr) {
+            success: function (data, status, request) {
                 status_url = request.getResponseHeader('Location');
-                console.log('handling...');
+                console.log('handling');
                 update_progress(status_url);
             },
-            error: function (responseStr) {
-                console.log("error");
+            error: function () {
+                alert('Unexpected error');
             }
         });
     });
