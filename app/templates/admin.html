@@ -121,12 +121,16 @@
         </div>
     </div>
     <p id="tag"><strong>当前库中共有{{ totalcount }}个黑名单号码</strong></p>
-    {% for message in get_flashed_messages() %}
-        <div class="alert alert-warning" class="flash">
-            {{ message }}
-        </div>
-    {% endfor %}
+    <div>
+        {% for message in get_flashed_messages() %}
+            <div class="alert alert-warning" class="flash">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
     {% if blackitem %}
+
+
         <div class="row margintop50">
             <table class="table table-bordered">
                 <thead>
