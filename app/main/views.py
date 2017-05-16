@@ -89,8 +89,6 @@ def taskstatus(task_id):
 
 @main.route('/admin', methods=['GET', 'POST'])
 def admin():
-    print request.url
-    print request.remote_addr
     if current_user.is_anonymous:
         return redirect(url_for('auth.login'))
     uploadform = UploadForm()
@@ -100,6 +98,7 @@ def admin():
 
     blacklist = BLACKLIST.query.all()
     if request.method == 'POST':
+        print request.url
         phone_pattern = re.compile('(86)?((173|177|180|181|189|133|153|170|149)\d{8}$)')
         tel_parttern = re.compile('^(0(25|510|516|519|512|513|518|517|515|514|511|523||527)\d{8}$)')
         create_person = BlACKUSER.query.get(int(current_user.id)).username
