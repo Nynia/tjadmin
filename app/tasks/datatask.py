@@ -2,7 +2,6 @@
 from app import celery, db
 from app.models import BLACKLIST
 import re, datetime
-from flask import jsonify
 
 
 @celery.task(bind=True)
@@ -48,7 +47,8 @@ def datahandle(self, filenames, type, remark, create_person):
         fp.close()
     db.session.commit()
 
-    print success_count, fail_count, illegal_numbers
+    print success_count, fail_count, repeat_count,illegal_numbers
+    content = (u'成功导入%d个黑名单号码，重复号码%d个，非法号码%d个') % (success_count, repeat_count, fail_count)
 
-    return {'success': success_count, 'fail': fail_count, 'repeat': repeat_count, 'status': 'Task completed!',
-                    'result': 42}
+    return {'content': content, 'numbers': illegal_numbers, 'status': 'Task completed!',
+            'result': 0}

@@ -253,8 +253,12 @@
                 if ('result' in data) {
                     // show result
                     console.log(data['state']);
-                    var content = '处理完成,成功导入{0}个黑名单号码，重复号码{1}个，非法号码{2}个。非法号码列表：{3}'.format(data['success'], data['repeat'], data['fail'], data['result']);
-                    $('#tag').append("<div class=\"alert alert-warning\" class=\"flash\">" + content + "</div>");
+                    console.log(data['numbers']);
+                    console.log(data['content']);
+                    $('#tag').empty();
+                    $('#tag').append("<div class=\"alert alert-warning\" class=\"flash\">" + '处理完成' + "</div>");
+                    $('#tag').append("<div class=\"alert alert-warning\" class=\"flash\">" + data['content'] + "</div>");
+                    $('#tag').append("<div class=\"alert alert-warning\" class=\"flash\">" + '非法号码列表：' + data['numbers'] + "</div>");
                 }
                 else {
                     // something unexpected happened
