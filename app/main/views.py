@@ -53,7 +53,7 @@ def upload():
     task = datahandle.delay(filenames, type, remark, create_person)
     return jsonify({}), 202, {'Location': url_for('main.taskstatus',
                                                   task_id=task.id)}
-@main.route('/status/<task_id>')
+@main.route('/status/<task_id>',methods=['GET'])
 def taskstatus(task_id):
     task = datahandle.AsyncResult(task_id)
     if task.state == 'PENDING':
