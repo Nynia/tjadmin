@@ -216,6 +216,7 @@
     });
     function update_progress(status_url) {
         // send GET request to status URL
+        console.log(status_url);
         $.getJSON(status_url, function (data) {
             // update UI
             console.log(data);
