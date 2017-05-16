@@ -209,7 +209,7 @@
             success: function (data, status, request) {
                 status_url = request.getResponseHeader('Location');
                 console.log(status_url);
-                $('#weiyi').text(status);
+                $('#weiyi').text(status_url);
                 //update_progress(status_url.substr(status_url.lastIndexOf('/')));
             },
             error: function () {
