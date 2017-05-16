@@ -220,12 +220,13 @@
         $.ajax({
             url: '/status' + status_url,
             type: 'GET',
+            data:{},
             dataType:'json',
             success: function (data, status, request) {
                 console.log(data);
             },
-            error: function (data) {
-                console.log(data);
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                console.log(XMLHttpRequest.status);
             }
         });
 
