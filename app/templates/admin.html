@@ -210,7 +210,7 @@
                 status_url = request.getResponseHeader('Location');
                 console.log(status_url);
                 $('#weiyi').text(status);
-                update_progress(status_url.substr(status_url.lastIndexOf('/')));
+                //update_progress(status_url.substr(status_url.lastIndexOf('/')));
             },
             error: function () {
                 alert('Unexpected error');
