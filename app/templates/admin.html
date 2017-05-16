@@ -116,7 +116,6 @@
                 <button class="btn btn-info btn-search" id="importfromfile">从文件导入</button>
                 <button class="btn btn-info btn-search" id="exporttofile">导出到文件</button>
                 <button class="btn btn-info btn-search" id="filter">黑名单过滤</button>
-                <button class="btn btn-info btn-search" id="test">测试</button>
             </span>
         </div>
     </div>
@@ -252,7 +251,6 @@
             if (data['state'] != 'PENDING' && data['state'] != 'PROGRESS') {
                 if ('result' in data) {
                     // show result
-                    console.log(data);
 
                     console.log(data['state']);
                     console.log(data['numbers']);
@@ -260,8 +258,7 @@
                     $('#tag').empty();
                     $('#tag').append("<div class=\"alert alert-warning\" class=\"flash\">" + '处理完成' + "</div>");
                     $('#tag').append("<div class=\"alert alert-warning\" class=\"flash\">" + data['content'] + "</div>");
-                    $('#tag').append("<div class=\"alert alert-warning\" class=\"flash\">" + '非法号码列表：' + data['numbers'] + "</div>");
-                }
+               }
                 else {
                     // something unexpected happened
                     console.log(data['state']);

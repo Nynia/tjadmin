@@ -49,7 +49,11 @@ def upload():
     type = '1' if request.form.get('type') == 'black' else '2'
     remark = request.form.get('remark')
     for file in request.files.getlist('blackfile'):
-        filename = hashlib.md5(secure_filename(file.filename) + str(time.time())).hexdigest()[:15]
+        suffix = file.filename[file.filename.rindex('.'):]
+        print suffix
+        if suffix not in ['txt','csv','xls','xlsx']:
+            continue
+        filename = hashlib.md5(secure_filename(file.filename) + str(time.time())).hexdigest()[:15]+suffix
         file.save(os.path.join('./res/', filename))
         filenames.append(filename)
     task = datahandle.delay(filenames, type, remark, create_person)
@@ -69,7 +73,6 @@ def taskstatus(task_id):
         response = {
             'state': task.state,
             'content': task.info.get('content', ''),
-            'numbers': task.info.get('numbers', ''),
             'status': task.info.get('status', '')
         }
         if 'result' in task.info:
@@ -88,7 +91,6 @@ def taskstatus(task_id):
 def admin():
     if current_user.is_anonymous:
         return redirect(url_for('auth.login'))
-    uploadform = UploadForm()
     singleaddform = SingleAddForm()
     filterform = FilterForm()
     blackitem = None
@@ -99,56 +101,7 @@ def admin():
         phone_pattern = re.compile('(86)?((173|177|180|181|189|133|153|170|149)\d{8}$)')
         tel_parttern = re.compile('^(0(25|510|516|519|512|513|518|517|515|514|511|523||527)\d{8}$)')
         create_person = BlACKUSER.query.get(int(current_user.id)).username
-        if uploadform.validate_on_submit():
-            filenames = []
-            type = '1' if uploadform.type.data == 'black' else '2'
-            remark = uploadform.remark.data
-            for file in request.files.getlist('blackfile'):
-                filename = hashlib.md5(secure_filename(file.filename) + str(time.time())).hexdigest()[:15]
-                file.save(os.path.join('./res/', filename))
-                filenames.append(filename)
-            datahandle.delay(filenames, type, remark, create_person)
-            flash(u'正在处理...')
-            return redirect(url_for('main.admin'))
-            #     fp = open('./res/'+filename,'r')
-            #     type = '1' if uploadform.type.data == 'black' else '2'
-            #     remark = uploadform.remark.data
-            #     for item in fp.readlines():
-            #         number = filter(str.isdigit, item.strip())
-            #         if number == '':
-            #             continue
-            #         match = phone_pattern.match(number)
-            #         if match:
-            #             number = match.group(2)
-            #         else:
-            #             match = tel_parttern.match(number)
-            #             if match:
-            #                 number = match.group(1)
-            #             else:
-            #                 illegal_numbers += number + ';'
-            #                 fail_count += 1
-            #                 continue
-            #         #print number
-            #         if not BLACKLIST.query.get(number):
-            #             blackitem = BLACKLIST()
-            #             blackitem.id = number
-            #             blackitem.createtime = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
-            #             blackitem.state = '1'
-            #             blackitem.type = type
-            #             blackitem.remark = remark if remark else '无'
-            #             blackitem.create_person = create_person
-            #             blackitem.create_mode = '2'
-            #             db.session.add(blackitem)
-            #             success_count += 1
-            #         else:
-            #             repeat_count += 1
-            #     fp.close()
-            # uploadform.remark.data = ''
-            # flash((u'成功导入%d个黑名单号码，重复号码%d个，非法号码%d个') % (success_count,repeat_count,fail_count))
-            # flash((u'非法号码列表：%s') % illegal_numbers)
-            # db.session.commit()
-            # return redirect(url_for('main.admin'))
-        elif singleaddform.validate_on_submit():
+        if singleaddform.validate_on_submit():
             success_count = 0
             fail_count = 0
             repeat_count = 0
@@ -163,7 +116,6 @@ def admin():
                     if match:
                         number = match.group(1)
                     else:
-                        # flash(u'%s 添加失败，号码不符合规范或者非电信号码' % number)
                         fail_count += 1
                         continue
                 if not BLACKLIST.query.get(number):
@@ -208,7 +160,6 @@ def admin():
                     filter_count += 1
             flash(u'过滤成功，共过滤黑名单号码%d个' % filter_count)
             fp.close()
-            db.session.commit()
             download_file.close()
             return redirect(url_for('main.admin', filter=urllib.quote(download_name.encode('utf-8'))))
     elif request.args.get('blacksearch'):
@@ -218,14 +169,12 @@ def admin():
     elif request.args.get('filter'):
         # print repr(str(request.args.get('filter')))
         filename = urllib.unquote(str(request.args.get('filter')))
-        # print repr(filename)
         filter_path = '..' + os.sep + 'res' + os.sep + filename.decode('utf-8')
         response = make_response(send_file(filter_path))
         response.headers["Content-Disposition"] = "attachment; filename=%s;" % filename
         return response
-    return render_template('admin.html', uploadform=uploadform, singleaddform=singleaddform, filterform=filterform,
+    return render_template('admin.html', singleaddform=singleaddform, filterform=filterform,
                            blackitem=blackitem, totalcount=len(blacklist))
-
 
 @main.route('/export', methods=['GET'])
 def export():
