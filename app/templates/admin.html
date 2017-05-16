@@ -207,7 +207,7 @@
             success: function (data, status, request) {
                 status_url = request.getResponseHeader('Location');
                 console.log(status_url);
-                update_progress(status_url);
+                update_progress(status_url.substr(status_url.lastIndexOf('/')));
             },
             error: function () {
                 alert('Unexpected error');
@@ -216,8 +216,9 @@
     });
     function update_progress(status_url) {
         // send GET request to status URL
+        console.log(status_url);
         $.ajax({
-            url: status_url,
+            url: '/status',
             type: 'GET',
             dataType:'json',
             success: function (data, status, request) {
