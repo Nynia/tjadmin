@@ -40,6 +40,8 @@ def root():
 
 @main.route('/upload', methods=['POST'])
 def upload():
+    print request.url
+    print request.remote_addr
     create_person = BlACKUSER.query.get(int(current_user.id)).username
     filenames = []
     print request.form
@@ -87,6 +89,8 @@ def taskstatus(task_id):
 
 @main.route('/admin', methods=['GET', 'POST'])
 def admin():
+    print request.url
+    print request.remote_addr
     if current_user.is_anonymous:
         return redirect(url_for('auth.login'))
     uploadform = UploadForm()
