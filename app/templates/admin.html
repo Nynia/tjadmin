@@ -198,24 +198,47 @@
             url: '/upload',
             type: 'POST',
             data: formData,
-            cache:false,
+            cache: false,
             processData: false,
             contentType: false,
             beforeSend: function () {
                 console.log("正在进行，请稍候");
             },
             success: function (responseStr) {
-                if (responseStr.status === 0) {
-                    console.log("成功" + responseStr);
-                } else {
-                    console.log("失败");
-                }
+                status_url = request.getResponseHeader('Location');
+                $('#flash').html('正在处理...');
+                update_progress(status_url);
             },
             error: function (responseStr) {
                 console.log("error");
             }
         });
-    })
+    });
+    function update_progress(status_url) {
+        // send GET request to status URL
+        $.getJSON(status_url, function (data) {
+            // update UI
+            if (data['state'] != 'PENDING' && data['state'] != 'PROGRESS') {
+                if ('result' in data) {
+                    // show result
+                    $('#flash').html(data['result']);
+                }
+                else {
+                    // something unexpected happened
+                    $('#flash').html('error');
+                }
+            }
+            else {
+                // rerun in 2 seconds
+                setTimeout(function () {
+                    update_progress(status_url);
+                }, 2000);
+            }
+        });
+    }
+    $(function () {
+        $('#start-bg-job').click(start_long_task);
+    });
 </script>
 </body>
 </html>
