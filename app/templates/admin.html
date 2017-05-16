@@ -116,10 +116,12 @@
                 <button class="btn btn-info btn-search" id="importfromfile">从文件导入</button>
                 <button class="btn btn-info btn-search" id="exporttofile">导出到文件</button>
                 <button class="btn btn-info btn-search" id="filter">黑名单过滤</button>
+                <button class="btn btn-info btn-search" id="test">测试</button>
             </span>
         </div>
     </div>
     <p><strong>当前库中共有{{ totalcount }}个黑名单号码</strong></p>
+    <input type="text" id="weiyi">
     {% for message in get_flashed_messages() %}
         <div class="alert alert-warning" id="flash">
             {{ message }}
@@ -207,10 +209,27 @@
             success: function (data, status, request) {
                 status_url = request.getResponseHeader('Location');
                 console.log(status_url);
+                $('#weiyi').val(status_url);
                 update_progress(status_url.substr(status_url.lastIndexOf('/')));
             },
             error: function () {
                 alert('Unexpected error');
+            }
+        });
+    });
+    $('#test').click(function () {
+        var status_url = $('#weiyi').val();
+        $.ajax({
+            url: status_url,
+            type: 'GET',
+            data:{'a':1},
+            success: function (data) {
+                console.log(data);
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                console.log(XMLHttpRequest.status);
+                console.log(XMLHttpRequest.readyState);
+                console.log(textStatus)
             }
         });
     });
