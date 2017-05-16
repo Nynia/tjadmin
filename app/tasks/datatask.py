@@ -50,5 +50,5 @@ def datahandle(self, filenames, type, remark, create_person):
 
     print success_count, fail_count, illegal_numbers
 
-    return jsonify({'success': success_count, 'fail': fail_count, 'repeat': repeat_count, 'status': 'Task completed!',
-                    'result': illegal_numbers})
+    return {'success': success_count, 'fail': fail_count, 'repeat': repeat_count, 'status': 'Task completed!',
+                    'result': illegal_numbers}
