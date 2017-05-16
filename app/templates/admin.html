@@ -216,28 +216,25 @@
     });
     function update_progress(status_url) {
         // send GET request to status URL
-        console.log(status_url);
-        $.getJSON(status_url, function (data) {
-            // update UI
-            console.log(data);
-            if (data['state'] != 'PENDING' && data['state'] != 'PROGRESS') {
-                if ('result' in data) {
-                    // show result
-                    console.log('completed');
-                }
-                else {
-                    // something unexpected happened
-                    $('#flash').html('error');
-                }
-            }
-            else {
-                //console.log(data['state']);
-                // rerun in 2 seconds
-                setTimeout(function () {
-                    update_progress(status_url);
-                }, 2000);
-            }
-        });
+        $.getJSON(status_url, function(data) {
+          // update UI
+          if (data['state'] != 'PENDING' && data['state'] != 'PROGRESS') {
+              if ('result' in data) {
+                  // show result
+                  console.log(data['state']);
+              }
+              else {
+                  // something unexpected happened
+                  console.log(data['state']);
+              }
+          }
+          else {
+              // rerun in 2 seconds
+              setTimeout(function() {
+                  update_progress(status_url);
+              }, 2000);
+          }
+      });
     }
 </script>
 </body>
