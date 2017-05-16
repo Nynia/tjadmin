@@ -121,7 +121,6 @@
         </div>
     </div>
     <p><strong>当前库中共有{{ totalcount }}个黑名单号码</strong></p>
-    <p id="weiyi"></p>
     {% for message in get_flashed_messages() %}
         <div class="alert alert-warning" id="flash">
             {{ message }}
@@ -211,7 +210,6 @@
             success: function (data, status, request) {
                 status_url = request.getResponseHeader('Location');
                 console.log(status_url);
-                $('#weiyi').text(status_url);
                 update_progress(status_url);
             },
             error: function () {
@@ -220,35 +218,26 @@
         });
 
     });
-    $('#test').click(function () {
-        $.ajax({
-            url: status_url,
-            type: 'GET',
-            data:{'a':1},
-            success: function (data) {
-                console.log(data);
-            },
-            error: function (XMLHttpRequest, textStatus, errorThrown) {
-                console.log(XMLHttpRequest.status);
-                console.log(XMLHttpRequest.readyState);
-                console.log(textStatus)
-            }
-        });
-    });
     function update_progress(status_url) {
         // send GET request to status URL
         console.log(status_url);
-        $.ajax({
-            url: status_url,
-            type: 'GET',
-            data:{'a':1},
-            success: function (data) {
-                console.log(data);
-            },
-            error: function (XMLHttpRequest, textStatus, errorThrown) {
-                console.log(XMLHttpRequest.status);
-                console.log(XMLHttpRequest.readyState);
-                console.log(textStatus)
+        $.getJSON(status_url, function (data) {
+            // update UI
+            if (data['state'] != 'PENDING' && data['state'] != 'PROGRESS') {
+                if ('result' in data) {
+                    // show result
+                    console.log(data['state']);
+                }
+                else {
+                    // something unexpected happened
+                    console.log(data['state']);
+                }
+            }
+            else {
+                // rerun in 2 seconds
+                setTimeout(function () {
+                    update_progress(status_url);
+                }, 2000);
             }
         });
     }
