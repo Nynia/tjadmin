@@ -194,7 +194,8 @@
     $('#filtermodal button').click(function () {
         $('#filtermodal').modal('hide');
     });
-    $('#import-button').click(function () {
+    $('#import-button').click(function (event) {
+        event.preventDefault();
         var formData = new FormData($('#import-form')[0]);
         $.ajax({
             url: '/upload',
