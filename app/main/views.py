@@ -51,7 +51,7 @@ def upload():
         file.save(os.path.join('./res/', filename))
         filenames.append(filename)
     task = datahandle.delay(filenames, type, remark, create_person)
-    return jsonify({}), 202, {'Location': url_for('taskstatus',
+    return jsonify({}), 202, {'Location': url_for('main.taskstatus',
                                                   task_id=task.id)}
 @main.route('/status/<task_id>')
 def taskstatus(task_id):
