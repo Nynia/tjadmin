@@ -216,25 +216,17 @@
     });
     function update_progress(status_url) {
         // send GET request to status URL
-        $.getJSON(status_url, function(data) {
-          // update UI
-          if (data['state'] != 'PENDING' && data['state'] != 'PROGRESS') {
-              if ('result' in data) {
-                  // show result
-                  console.log(data['state']);
-              }
-              else {
-                  // something unexpected happened
-                  console.log(data['state']);
-              }
-          }
-          else {
-              // rerun in 2 seconds
-              setTimeout(function() {
-                  update_progress(status_url);
-              }, 2000);
-          }
-      });
+        $.ajax({
+            url: status_url,
+            type: 'GET',
+            dataType:'json',
+            success: function (data, status, request) {
+                console.log(data);
+            },
+            error: function () {
+                console.log('error');
+            }
+        });
     }
 </script>
 </body>
