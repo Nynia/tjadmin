@@ -1,10 +1,11 @@
 # -*-coding=utf-8-*-
-from app import celery,db
-from app.models import BLACKLIST,BlACKUSER
-import re,datetime
+from app import celery, db
+from app.models import BLACKLIST
+import re, datetime
 
-@celery.task
-def datahandle(filenames, type, remark, create_person):
+
+@celery.task(bind=True)
+def datahandle(self, filenames, type, remark, create_person):
     phone_pattern = re.compile('(86)?((173|177|180|181|189|133|153|170|149)\d{8}$)')
     tel_parttern = re.compile('^(0(25|510|516|519|512|513|518|517|515|514|511|523||527)\d{8}$)')
 
@@ -45,4 +46,12 @@ def datahandle(filenames, type, remark, create_person):
                 repeat_count += 1
         fp.close()
     db.session.commit()
+
     print success_count, fail_count, illegal_numbers
+    self.update_state(state='FINISHED',
+                      meta={'success': success_count,
+                            'fail': fail_count,
+                            'illegal': illegal_numbers})
+
+    return {'current': 100, 'total': 100, 'status': 'Task completed!',
+            'result': 42}

@@ -55,21 +55,26 @@
             </div>
             <div class="modal-body">
                 <p style="color:red;font-weight:bold;">请上传TXT格式文件，文件中每行一条数据，可同时上传多个文件</p>
-                <form action="/admin" method="post" enctype=multipart/form-data>
-                    {{ uploadform.hidden_tag() }}
+                <form id="import-form" action="/admin" method="post" enctype="multipart/form-data">
                     <div class="form-group">
-                        {{ uploadform.blackfile.label }}{{ uploadform.blackfile(multiple="multiple",accept="text/plain") }}
+                        <label for="blackfile">黑名单文件</label>
+                        <input id="blackfile" name="blackfile" type="file" multiple="multiple">
                         <div class="form-group">
-                            {{ uploadform.type.label }}{{ uploadform.type(class="form-control") }}
+                            <label for="type">类型</label>
+                            <select class="form-control" id="type2" name="type">
+                                <option value="black">黑名单</option>
+                                <option value="red">红名单</option>
+                            </select>
                         </div>
                         <div class="form-group">
-                            {{ uploadform.remark.label }}{{ uploadform.remark(class="form-control") }}
+                            <label for="remark">备注</label>
+                            <input class="form-control" id="remark2" name="remark"
+                                   type="text" value="">
                         </div>
-
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-default cancel">取消</button>
-                        {{ uploadform.submit(class="btn btn-primary") }}
+                        <input class="btn btn-primary" id="import-button" name="submit" type="submit" value="提交">
                     </div>
                 </form>
             </div>
@@ -114,7 +119,7 @@
             </span>
         </div>
     </div>
-        <p><strong>当前库中共有{{ totalcount }}个黑名单号码</strong></p>
+    <p><strong>当前库中共有{{ totalcount }}个黑名单号码</strong></p>
     {% for message in get_flashed_messages() %}
         <div class="alert alert-warning" id="flash">
             {{ message }}
@@ -187,6 +192,30 @@
     $('#filtermodal button').click(function () {
         $('#filtermodal').modal('hide');
     });
+    $('#import-button').click(function () {
+        var formData = new FormData($('#import-form')[0]);
+        $.ajax({
+            url: '/upload',
+            type: 'POST',
+            data: formData,
+            cache:false,
+            processData: false,
+            contentType: false,
+            beforeSend: function () {
+                console.log("正在进行，请稍候");
+            },
+            success: function (responseStr) {
+                if (responseStr.status === 0) {
+                    console.log("成功" + responseStr);
+                } else {
+                    console.log("失败");
+                }
+            },
+            error: function (responseStr) {
+                console.log("error");
+            }
+        });
+    })
 </script>
 </body>
 </html>
