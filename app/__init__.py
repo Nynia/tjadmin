@@ -1,8 +1,9 @@
 from flask import Flask
 from flask_bootstrap import Bootstrap
-from config import config
+from config import config,BaseConfig
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
+from celery import Celery
 
 bootstrap = Bootstrap()
 db = SQLAlchemy()
@@ -10,6 +11,8 @@ db = SQLAlchemy()
 login_manager = LoginManager()
 login_manager.session_protection = 'strong'
 login_manager.login_view = 'auth.login'
+
+celery = Celery(__name__,broker=BaseConfig.CELERY_BROKER_URL)
 
 def create_app(config_name):
     app = Flask(__name__)
@@ -22,6 +25,8 @@ def create_app(config_name):
 
     with app.test_request_context():
         db.create_all(bind=['ora11g'])
+
+    celery.conf.update(app.config)
 
     from .auth import auth as auth_blueprint
     app.register_blueprint(auth_blueprint, url_prefix='/auth')

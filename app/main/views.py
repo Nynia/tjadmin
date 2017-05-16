@@ -7,6 +7,7 @@ from .form import UploadForm,SingleAddForm,FilterForm
 import os,hashlib,time,re,datetime,urllib
 from app import db
 from flask_login import login_required,current_user
+from app.tasks.datatask import datahandle
 
 @main.route('/config', methods=['GET'])
 def root():
@@ -54,50 +55,54 @@ def admin():
             fail_count = 0
             repeat_count = 0
             illegal_numbers = ''
-            illegal_fp = open('./res/illegal.txt','w+')
+            filenames = []
+            type = '1' if uploadform.type.data == 'black' else '2'
+            remark = uploadform.remark.data
             for file in request.files.getlist('blackfile'):
                 filename = hashlib.md5(secure_filename(file.filename) + str(time.time())).hexdigest()[:15]
                 file.save(os.path.join('./res/', filename))
-                fp = open('./res/'+filename,'r')
-                type = '1' if uploadform.type.data == 'black' else '2'
-                remark = uploadform.remark.data
-                for item in fp.readlines():
-                    number = filter(str.isdigit, item.strip())
-                    if number == '':
-                        continue
-                    match = phone_pattern.match(number)
-                    if match:
-                        number = match.group(2)
-                    else:
-                        match = tel_parttern.match(number)
-                        if match:
-                            number = match.group(1)
-                        else:
-                            illegal_fp.write(number+'\n')
-                            illegal_numbers += number + ';'
-                            fail_count += 1
-                            continue
-                    #print number
-                    if not BLACKLIST.query.get(number):
-                        blackitem = BLACKLIST()
-                        blackitem.id = number
-                        blackitem.createtime = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
-                        blackitem.state = '1'
-                        blackitem.type = type
-                        blackitem.remark = remark if remark else '无'
-                        blackitem.create_person = create_person
-                        blackitem.create_mode = '2'
-                        db.session.add(blackitem)
-                        success_count += 1
-                    else:
-                        repeat_count += 1
-                fp.close()
-            uploadform.remark.data = ''
-            flash((u'成功导入%d个黑名单号码，重复号码%d个，非法号码%d个') % (success_count,repeat_count,fail_count))
-            flash((u'非法号码列表：%s') % illegal_numbers)
-            illegal_fp.close()
-            db.session.commit()
+                filenames.append(filename)
+            datahandle.deley(filenames,type,remark,current_user)
+            flash(u'正在处理...')
             return redirect(url_for('main.admin'))
+            #     fp = open('./res/'+filename,'r')
+            #     type = '1' if uploadform.type.data == 'black' else '2'
+            #     remark = uploadform.remark.data
+            #     for item in fp.readlines():
+            #         number = filter(str.isdigit, item.strip())
+            #         if number == '':
+            #             continue
+            #         match = phone_pattern.match(number)
+            #         if match:
+            #             number = match.group(2)
+            #         else:
+            #             match = tel_parttern.match(number)
+            #             if match:
+            #                 number = match.group(1)
+            #             else:
+            #                 illegal_numbers += number + ';'
+            #                 fail_count += 1
+            #                 continue
+            #         #print number
+            #         if not BLACKLIST.query.get(number):
+            #             blackitem = BLACKLIST()
+            #             blackitem.id = number
+            #             blackitem.createtime = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
+            #             blackitem.state = '1'
+            #             blackitem.type = type
+            #             blackitem.remark = remark if remark else '无'
+            #             blackitem.create_person = create_person
+            #             blackitem.create_mode = '2'
+            #             db.session.add(blackitem)
+            #             success_count += 1
+            #         else:
+            #             repeat_count += 1
+            #     fp.close()
+            # uploadform.remark.data = ''
+            # flash((u'成功导入%d个黑名单号码，重复号码%d个，非法号码%d个') % (success_count,repeat_count,fail_count))
+            # flash((u'非法号码列表：%s') % illegal_numbers)
+            # db.session.commit()
+            # return redirect(url_for('main.admin'))
         elif singleaddform.validate_on_submit():
             success_count = 0
             fail_count = 0
