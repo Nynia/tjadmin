@@ -206,7 +206,7 @@
             },
             success: function (responseStr) {
                 status_url = request.getResponseHeader('Location');
-                $('#flash').html('正在处理...');
+                console.log('handling...');
                 update_progress(status_url);
             },
             error: function (responseStr) {
@@ -221,7 +221,7 @@
             if (data['state'] != 'PENDING' && data['state'] != 'PROGRESS') {
                 if ('result' in data) {
                     // show result
-                    $('#flash').html(data['result']);
+                    console.log('completed');
                 }
                 else {
                     // something unexpected happened
