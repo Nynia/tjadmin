@@ -48,10 +48,6 @@ def datahandle(self, filenames, type, remark, create_person):
     db.session.commit()
 
     print success_count, fail_count, illegal_numbers
-    self.update_state(state='FINISHED',
-                      meta={'success': success_count,
-                            'fail': fail_count,
-                            'illegal': illegal_numbers})
 
-    return {'current': 100, 'total': 100, 'status': 'Task completed!',
-            'result': 42}
+    return {'success': success_count, 'fail': fail_count, 'status': 'Task completed!',
+            'result': illegal_numbers}
