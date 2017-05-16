@@ -231,7 +231,7 @@
                 if ('result' in data) {
                     // show result
                     console.log(data['state']);
-                    console.log(data['meta']['success']);
+                    console.log(data['meta']);
                     $('#tag').append("<div class=\"alert alert-warning\" class=\"flash\">" + '处理完成' + "</div>");
                 }
                 else {
