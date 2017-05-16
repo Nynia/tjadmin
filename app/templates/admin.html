@@ -218,7 +218,7 @@
         // send GET request to status URL
         console.log(status_url);
         $.ajax({
-            url: '/status',
+            url: '/status' + status_url,
             type: 'GET',
             dataType:'json',
             success: function (data, status, request) {
