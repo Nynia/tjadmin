@@ -56,6 +56,7 @@ def upload():
 @main.route('/status/<task_id>',methods=['GET'])
 def taskstatus(task_id):
     print request.url
+    print request.remote_addr
     print task_id
     task = datahandle.AsyncResult(task_id)
     if task.state == 'PENDING':
