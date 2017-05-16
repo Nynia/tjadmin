@@ -120,9 +120,9 @@
             </span>
         </div>
     </div>
-    <p><strong>当前库中共有{{ totalcount }}个黑名单号码</strong></p>
+    <p id="tag"><strong>当前库中共有{{ totalcount }}个黑名单号码</strong></p>
     {% for message in get_flashed_messages() %}
-        <div class="alert alert-warning" id="flash">
+        <div class="alert alert-warning" class="flash">
             {{ message }}
         </div>
     {% endfor %}
@@ -210,6 +210,10 @@
             success: function (data, status, request) {
                 status_url = request.getResponseHeader('Location');
                 console.log(status_url);
+                if ($('.flash').length > 0) {
+                    $('.flash').remove();
+                }
+                $('#tag').append("<div class=\"alert alert-warning\" class=\"flash\">" + '正在处理...' + "</div>");
                 update_progress(status_url);
             },
             error: function () {
@@ -227,6 +231,7 @@
                 if ('result' in data) {
                     // show result
                     console.log(data['state']);
+                    $('.flash:last').append("<div class=\"alert alert-warning\" class=\"flash\">" + '处理完成' + "</div>");
                 }
                 else {
                     // something unexpected happened
