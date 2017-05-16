@@ -222,12 +222,12 @@
         });
 
     });
-    String.prototype.format = function(args) {
+    String.prototype.format = function (args) {
         var result = this;
         if (arguments.length > 0) {
             if (arguments.length == 1 && typeof (args) == "object") {
                 for (var key in args) {
-                    if(args[key]!=undefined){
+                    if (args[key] != undefined) {
                         var reg = new RegExp("({" + key + "})", "g");
                         result = result.replace(reg, args[key]);
                     }
@@ -236,7 +236,7 @@
             else {
                 for (var i = 0; i < arguments.length; i++) {
                     if (arguments[i] != undefined) {
-                        var reg= new RegExp("({)" + i + "(})", "g");
+                        var reg = new RegExp("({)" + i + "(})", "g");
                         result = result.replace(reg, arguments[i]);
                     }
                 }
@@ -253,7 +253,7 @@
                 if ('result' in data) {
                     // show result
                     console.log(data['state']);
-                    var content = '处理完成,成功导入{0}个黑名单号码，重复号码{1}个，非法号码{2}个。非法号码列表：{3}'.format(data['success'],data['repeat'],data['fail'],data['result']);
+                    var content = '处理完成,成功导入{0}个黑名单号码，重复号码{1}个，非法号码{2}个。非法号码列表：{3}'.format(data['success'], data['repeat'], data['fail'], data['result']);
                     $('#tag').append("<div class=\"alert alert-warning\" class=\"flash\">" + content + "</div>");
                 }
                 else {
