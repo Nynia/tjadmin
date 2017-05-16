@@ -220,7 +220,7 @@
         $.ajax({
             url: '/status' + status_url,
             type: 'GET',
-            data:{},
+            data:{'a':1},
             dataType:'json',
             success: function (data, status, request) {
                 console.log(data);
