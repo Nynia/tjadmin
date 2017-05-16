@@ -212,7 +212,7 @@
                 status_url = request.getResponseHeader('Location');
                 console.log(status_url);
                 $('#weiyi').text(status_url);
-                //update_progress(status_url.substr(status_url.lastIndexOf('/')));
+                update_progress(status_url);
             },
             error: function () {
                 alert('Unexpected error');
@@ -221,7 +221,6 @@
 
     });
     $('#test').click(function () {
-        var status_url = $('#weiyi').text();
         $.ajax({
             url: status_url,
             type: 'GET',
@@ -240,7 +239,7 @@
         // send GET request to status URL
         console.log(status_url);
         $.ajax({
-            url: '/status' + status_url,
+            url: status_url,
             type: 'GET',
             data:{'a':1},
             success: function (data) {
