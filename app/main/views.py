@@ -51,7 +51,7 @@ def upload():
     for file in request.files.getlist('blackfile'):
         suffix = file.filename[file.filename.rindex('.'):]
         print suffix
-        if suffix not in ['txt','csv','xls','xlsx']:
+        if suffix not in ['.txt','.csv','.xls','.xlsx']:
             continue
         filename = hashlib.md5(secure_filename(file.filename) + str(time.time())).hexdigest()[:15]+suffix
         file.save(os.path.join('./res/', filename))
