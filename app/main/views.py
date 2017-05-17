@@ -195,11 +195,10 @@ def export():
 def download():
     filename = request.args.get('filename')
     print filename,repr(filename)
-    print filename.decode('utf-8'),repr(filename.decode('utf-8'))
-    fp = open('./res/' + filename.encode('utf-8'), 'r')
+    fp = open('./res/' + filename, 'r')
     content = ''
     for line in fp.readlines():
         content += line.strip('\n') + '\r\n'
     response = make_response(content)
-    response.headers["Content-Disposition"] = "attachment; filename=%s;" % filename
+    response.headers["Content-Disposition"] = "attachment; filename=%s;" % filename.encode('utf-8')
     return response
