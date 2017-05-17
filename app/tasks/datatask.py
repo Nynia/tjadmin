@@ -29,7 +29,7 @@ def datahandle(self, filenames, type, remark, create_person):
         u'泰州': '0523',
         u'宿迁': '0527'
     }
-
+    count_before = len(BLACKLIST.query.all())
     for filename in filenames:
         filename = './res/' + filename
         print filename
@@ -47,21 +47,18 @@ def datahandle(self, filenames, type, remark, create_person):
                     else:
                         fail_count += 1
                         continue
-                if not BLACKLIST.query.get(number):
-                    number_list.append(number)
-                    success_count += 1
-                    # blackitem = BLACKLIST()
-                    # blackitem.id = number
-                    # blackitem.createtime = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
-                    # blackitem.state = '1'
-                    # blackitem.type = type
-                    # blackitem.remark = remark if remark else u'无'
-                    # blackitem.create_person = create_person
-                    # blackitem.create_mode = '1'
-                    # db.session.add(blackitem)
-                    # success_count += 1
-                else:
-                    repeat_count += 1
+                number_list.append(number)
+                success_count += 1
+                # blackitem = BLACKLIST()
+                # blackitem.id = number
+                # blackitem.createtime = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
+                # blackitem.state = '1'
+                # blackitem.type = type
+                # blackitem.remark = remark if remark else u'无'
+                # blackitem.create_person = create_person
+                # blackitem.create_mode = '1'
+                # db.session.add(blackitem)
+                # success_count += 1
             fp.close()
         else:
             xls_data = get_data(filename)
@@ -84,28 +81,29 @@ def datahandle(self, filenames, type, remark, create_person):
                                 else:
                                     fail_count += 1
                                     continue
-                            if not BLACKLIST.query.get(number):
-                                number_list.append(number)
-                                success_count += 1
-                                # blackitem = BLACKLIST()
-                                # blackitem.id = number
-                                # blackitem.createtime = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
-                                # blackitem.state = '1'
-                                # blackitem.type = type
-                                # blackitem.remark = remark if remark else u'无'
-                                # blackitem.create_person = create_person
-                                # blackitem.create_mode = '1'
-                                # db.session.add(blackitem)
-                                # success_count += 1
-                            else:
-                                repeat_count += 1
+                            number_list.append(number)
+                            success_count += 1
+                            # blackitem = BLACKLIST()
+                            # blackitem.id = number
+                            # blackitem.createtime = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
+                            # blackitem.state = '1'
+                            # blackitem.type = type
+                            # blackitem.remark = remark if remark else u'无'
+                            # blackitem.create_person = create_person
+                            # blackitem.create_mode = '1'
+                            # db.session.add(blackitem)
+                            # success_count += 1
     timestamp = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
     db.session.execute(
-        BLACKLIST.__table__.insert(),
+        BLACKLIST.__table__.insert().prefix_with('IGNORE'),
         [{'id': `i`, 'remark': `remark`, 'type': `type`, 'state': '1', 'create_person': `create_person`,
           'create_mode': '1', 'createtime': `timestamp`} for i in number_list]
     )
     db.session.commit()
+
+    count_after = len(BLACKLIST.query.all())
+    repeat_count = success_count - (count_after-count_before)
+    success_count = count_after - count_before
 
     print success_count, fail_count, repeat_count
     content = (u'成功导入%d个黑名单号码，重复号码%d个，非法号码%d个') % (success_count, repeat_count, fail_count)
