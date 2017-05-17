@@ -195,7 +195,7 @@ def export():
 def download():
     filename = request.args.get('filename')
     print filename,repr(filename)
-    print type(filename)
+    print filename.decode('utf-8'),repr(filename.decode('utf-8'))
     fp = open('./res/' + filename.encode('utf-8'), 'r')
     content = ''
     for line in fp.readlines():
