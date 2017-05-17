@@ -9,7 +9,6 @@ from pyexcel_xls import get_data
 def datahandle(self, filenames, type, remark, create_person):
     success_count = 0
     fail_count = 0
-    repeat_count = 0
     number_list = []
     phone_pattern = re.compile('^(86)?((173|177|180|181|189|133|153|170|149)\d{8})$')
     tel_parttern = re.compile('^((025|0510|0516|0519|0512|0513|0518|0517|0515|0514|0511|0523||0527)?\d{8}$)')
@@ -29,10 +28,9 @@ def datahandle(self, filenames, type, remark, create_person):
         u'泰州': '0523',
         u'宿迁': '0527'
     }
-    count_before = len(BLACKLIST.query.all())
+    count_before = BLACKLIST.query.count()
     for filename in filenames:
         filename = './res/' + filename
-        print filename
         if filename[-3:] == 'txt':
             fp = open(filename, 'r')
             for number in fp.readlines():
@@ -49,16 +47,6 @@ def datahandle(self, filenames, type, remark, create_person):
                         continue
                 number_list.append(number)
                 success_count += 1
-                # blackitem = BLACKLIST()
-                # blackitem.id = number
-                # blackitem.createtime = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
-                # blackitem.state = '1'
-                # blackitem.type = type
-                # blackitem.remark = remark if remark else u'无'
-                # blackitem.create_person = create_person
-                # blackitem.create_mode = '1'
-                # db.session.add(blackitem)
-                # success_count += 1
             fp.close()
         else:
             xls_data = get_data(filename)
@@ -83,16 +71,6 @@ def datahandle(self, filenames, type, remark, create_person):
                                     continue
                             number_list.append(number)
                             success_count += 1
-                            # blackitem = BLACKLIST()
-                            # blackitem.id = number
-                            # blackitem.createtime = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
-                            # blackitem.state = '1'
-                            # blackitem.type = type
-                            # blackitem.remark = remark if remark else u'无'
-                            # blackitem.create_person = create_person
-                            # blackitem.create_mode = '1'
-                            # db.session.add(blackitem)
-                            # success_count += 1
     timestamp = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
     db.session.execute(
         BLACKLIST.__table__.insert().prefix_with('IGNORE'),
@@ -101,7 +79,7 @@ def datahandle(self, filenames, type, remark, create_person):
     )
     db.session.commit()
 
-    count_after = len(BLACKLIST.query.all())
+    count_after = BLACKLIST.query.count()
     repeat_count = success_count - (count_after-count_before)
     success_count = count_after - count_before
 

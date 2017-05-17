@@ -94,7 +94,7 @@ def admin():
     singleaddform = SingleAddForm()
     filterform = FilterForm()
     blackitem = None
-    blacklist = BLACKLIST.query.all()
+    totalcount = BLACKLIST.query.count()
     if request.method == 'POST':
         print request.url
         phone_pattern = re.compile('(86)?((173|177|180|181|189|133|153|170|149)\d{8}$)')
@@ -173,7 +173,7 @@ def admin():
         response.headers["Content-Disposition"] = "attachment; filename=%s;" % filename
         return response
     return render_template('admin.html', singleaddform=singleaddform, filterform=filterform,
-                           blackitem=blackitem, totalcount=len(blacklist))
+                           blackitem=blackitem, totalcount=totalcount)
 
 @main.route('/export', methods=['GET'])
 def export():
