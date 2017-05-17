@@ -84,7 +84,8 @@ def taskstatus(task_id):
         response = {
             'state': task.state,
             'content': task.info.get('content', ''),
-            'status': task.info.get('status', '')
+            'status': task.info.get('status', ''),
+            'action':task.info.get('action','')
         }
         if 'result' in task.info:
             response['result'] = task.info['result']
