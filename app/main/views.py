@@ -185,7 +185,7 @@ def export():
 @main.route('/download_export', methods=['GET'])
 def download_export():
     filename = request.args.get('filename')
-    fp = open(filename,'r')
+    fp = open('./res/' + filename, 'r')
     content = ''
     for line in fp.readlines():
         content += line + '\r\n'
