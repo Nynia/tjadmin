@@ -279,8 +279,7 @@
                         console.log(data['state']);
                         console.log(data['content']);
                         $('#tag').empty();
-                        $('#tag').append("<div class=\"alert alert-warning\" class=\"flash\">" + '导出完成' + "</div>");
-                        $('#tag').append("<div class=\"alert alert-warning\" class=\"flash\">" + data['content'] + "</div>");
+                        $('#tag').append("<div class=\"alert alert-warning\" class=\"flash\">" + '导出完成' + "<a href=\"/download_export?filename=" + data['content'] +"\">点击下载</a>" + "</div>");
                     }
                 }
                 else {
