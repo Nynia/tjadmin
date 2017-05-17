@@ -33,40 +33,68 @@ def datahandle(self, filenames, type, remark, create_person):
     for filename in filenames:
         filename = './res/' + filename
         print filename
-        xls_data = get_data(filename)
-        for sheet_name in xls_data.keys():
-            areaname = sheet_name[:2]
-            areano = areano_dict.get(areaname, '')
-
-            sheet_data = xls_data[sheet_name]
-            for row in sheet_data:
-                for cell in row:
-                    for number in number_parttern.findall(unicode(cell)):
-                        match = phone_pattern.match(number)
-                        if match:
-                            number = match.group(2)
-                        else:
-                            match = tel_parttern.match(number)
+        if filename[-3:] == 'txt':
+            fp = open(filename,'r')
+            for number in fp.readlines():
+                number = filter(str.isdigit, str(number.strip()))
+                match = phone_pattern.match(number)
+                if match:
+                    number = match.group(2)
+                else:
+                    match = tel_parttern.match(number)
+                    if match:
+                        number = match.group(1)
+                    else:
+                        fail_count += 1
+                        continue
+                if not BLACKLIST.query.get(number):
+                    blackitem = BLACKLIST()
+                    blackitem.id = number
+                    blackitem.createtime = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
+                    blackitem.state = '1'
+                    blackitem.type = type
+                    blackitem.remark = remark if remark else u'无'
+                    blackitem.create_person = create_person
+                    blackitem.create_mode = '1'
+                    db.session.add(blackitem)
+                    success_count += 1
+                else:
+                    repeat_count += 1
+                fp.close()
+        else:
+            xls_data = get_data(filename)
+            for sheet_name in xls_data.keys():
+                areaname = sheet_name[:2]
+                areano = areano_dict.get(areaname, '')
+                sheet_data = xls_data[sheet_name]
+                for row in sheet_data:
+                    for cell in row:
+                        for number in number_parttern.findall(unicode(cell)):
+                            match = phone_pattern.match(number)
                             if match:
-                                number = match.group(1)
-                                if len(number) == 8:
-                                    number = areano + number
+                                number = match.group(2)
                             else:
-                                fail_count += 1
-                                continue
-                        if not BLACKLIST.query.get(number):
-                            blackitem = BLACKLIST()
-                            blackitem.id = number
-                            blackitem.createtime = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
-                            blackitem.state = '1'
-                            blackitem.type = type
-                            blackitem.remark = remark if remark else u'无'
-                            blackitem.create_person = create_person
-                            blackitem.create_mode = '2'
-                            db.session.add(blackitem)
-                            success_count += 1
-                        else:
-                            repeat_count += 1
+                                match = tel_parttern.match(number)
+                                if match:
+                                    number = match.group(1)
+                                    if len(number) == 8:
+                                        number = areano + number
+                                else:
+                                    fail_count += 1
+                                    continue
+                            if not BLACKLIST.query.get(number):
+                                blackitem = BLACKLIST()
+                                blackitem.id = number
+                                blackitem.createtime = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
+                                blackitem.state = '1'
+                                blackitem.type = type
+                                blackitem.remark = remark if remark else u'无'
+                                blackitem.create_person = create_person
+                                blackitem.create_mode = '2'
+                                db.session.add(blackitem)
+                                success_count += 1
+                            else:
+                                repeat_count += 1
     db.session.commit()
 
     print success_count, fail_count, repeat_count

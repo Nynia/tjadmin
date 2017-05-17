@@ -94,7 +94,6 @@ def admin():
     singleaddform = SingleAddForm()
     filterform = FilterForm()
     blackitem = None
-
     blacklist = BLACKLIST.query.all()
     if request.method == 'POST':
         print request.url
@@ -131,7 +130,6 @@ def admin():
                     success_count += 1
                 else:
                     repeat_count += 1
-                    # flash(u'%s 已存在，请不要重复添加' % number)
             flash((u'成功添加%d个黑名单号码，重复号码%d个，非法号码%d个') % (success_count, repeat_count, fail_count))
             singleaddform.number.data = ''
             singleaddform.remark.data = ''

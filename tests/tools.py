@@ -45,10 +45,10 @@ def read_xls_file(filename):
 
 
 if __name__ == '__main__':
-    read_xls_file('test.xlsx')
+    read_xls_file('02.xlsx')
     print len(phone_list),len(tel_list),len(illegal_list)
-    #print phone_list
-    #print tel_list
+    print phone_list
+    print tel_list
     print illegal_list
 
 
