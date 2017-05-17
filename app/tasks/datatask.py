@@ -97,7 +97,7 @@ def export_numbers(self):
     for item in numbers:
         export_file.write(item[0] + '\n')
     export_file.close()
-    return {'content': export_file_name, 'status': 'Task completed!','action':'download',
+    return {'content': export_file_name, 'status': 'Task completed!','action':'export',
             'result': 0}
 
 @celery.task(bind=True)
