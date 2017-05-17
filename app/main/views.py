@@ -183,8 +183,7 @@ def admin():
         response = make_response(send_file(filter_path))
         response.headers["Content-Disposition"] = "attachment; filename=%s;" % filename
         return response
-    return render_template('admin.html', singleaddform=singleaddform, filterform=filterform,
-                           blackitem=blackitem, totalcount=totalcount)
+    return render_template('admin.html',singleaddform=singleaddform,blackitem=blackitem, totalcount=totalcount)
 
 @main.route('/export', methods=['GET'])
 def export():
@@ -195,6 +194,8 @@ def export():
 @main.route('/download', methods=['GET'])
 def download():
     filename = request.args.get('filename')
+    print filename
+    print type(filename)
     fp = open('./res/' + filename, 'r')
     content = ''
     for line in fp.readlines():
