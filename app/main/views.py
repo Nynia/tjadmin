@@ -7,7 +7,7 @@ from .form import UploadForm, SingleAddForm, FilterForm
 import os, hashlib, time, re, datetime, urllib
 from app import db
 from flask_login import login_required, current_user
-from app.tasks.datatask import datahandle,export
+from app.tasks.datatask import datahandle,export_numbers
 
 
 @main.route('/config', methods=['GET'])
@@ -178,7 +178,7 @@ def admin():
 
 @main.route('/export', methods=['GET'])
 def export():
-    task = export.delay()
+    task = export_numbers.delay()
     return jsonify({}), 202, {'Location': url_for('main.taskstatus',
                                                   task_id=task.id)}
 

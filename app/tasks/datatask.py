@@ -4,7 +4,6 @@ from app.models import BLACKLIST
 import re, datetime
 from pyexcel_xls import get_data
 
-
 @celery.task(bind=True)
 def datahandle(self, filenames, type, remark, create_person):
     success_count = 0
@@ -91,7 +90,7 @@ def datahandle(self, filenames, type, remark, create_person):
 
 
 @celery.task(bind=True)
-def export(self):
+def export_numbers(self):
     numbers = db.session.query(BLACKLIST.id).all()
     export_file_name = 'blacklist_' + datetime.datetime.now().strftime('%Y%m%d%H%M%S') + '.txt'
     export_file = open('./res/' + export_file_name, 'w+')
