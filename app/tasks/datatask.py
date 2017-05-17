@@ -60,7 +60,7 @@ def datahandle(self, filenames, type, remark, create_person):
                     success_count += 1
                 else:
                     repeat_count += 1
-                fp.close()
+            fp.close()
         else:
             xls_data = get_data(filename)
             for sheet_name in xls_data.keys():
