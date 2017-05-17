@@ -91,14 +91,14 @@
             </div>
             <div class="modal-body">
                 <p style="color:red;font-weight:bold;">待过滤文件必须为TXT格式，文件中每行一条数据</p>
-                <form action="/admin" method="post" enctype=multipart/form-data>
-                    {{ filterform.hidden_tag() }}
+                <form id="filter-form" method="post" enctype=multipart/form-data>
                     <div class="form-group">
-                        {{ filterform.sourcefile.label }}{{ filterform.sourcefile(multiple="multiple",accept="text/plain") }}
+                        <label for="sourcefile">源文件</label>
+                        <input accept="text/plain" id="sourcefile" name="sourcefile" type="file">
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-default cancel">取消</button>
-                        {{ filterform.submit(class="btn btn-primary") }}
+                        <input class="btn btn-primary" id="filter-button" name="submit" type="submit" value="过滤黑名单">
                     </div>
                 </form>
             </div>
@@ -239,6 +239,33 @@
         });
 
     });
+    $('#filter-button').click(function (event) {
+        event.preventDefault();
+        $('#filtermodal').modal('hide');
+        var formData = new FormData($('#filter-form')[0]);
+        $.ajax({
+            url: '/filter',
+            type: 'POST',
+            data: formData,
+            cache: false,
+            processData: false,
+            contentType: false,
+            beforeSend: function () {
+                console.log("正在进行，请稍候");
+            },
+            success: function (data, status, request) {
+                status_url = request.getResponseHeader('Location');
+                console.log(status_url);
+                $('#tag').empty();
+                $('#tag').append("<div class=\"alert alert-warning\" class=\"flash\">" + '正在过滤...' + "</div>");
+                update_progress(status_url);
+            },
+            error: function () {
+                alert('Unexpected error');
+            }
+        });
+
+    });
     String.prototype.format = function (args) {
         var result = this;
         if (arguments.length > 0) {
@@ -275,11 +302,18 @@
                         $('#tag').append("<div class=\"alert alert-warning\" class=\"flash\">" + '处理完成' + "</div>");
                         $('#tag').append("<div class=\"alert alert-warning\" class=\"flash\">" + data['content'] + "</div>");
                     }
+                    else if (data['action'] == 'export') {
+                        console.log(data['state']);
+                        console.log(data['content']);
+                        $('#tag').empty();
+                        $('#tag').append("<div class=\"alert alert-warning\" class=\"flash\">" + '导出完成' + "<a href=\"/download?filename=" + data['content'] + "\"> 点击下载</a>" + "</div>");
+                    }
                     else {
                         console.log(data['state']);
                         console.log(data['content']);
                         $('#tag').empty();
-                        $('#tag').append("<div class=\"alert alert-warning\" class=\"flash\">" + '导出完成' + "<a href=\"/download_export?filename=" + data['content'] +"\"> 点击下载</a>" + "</div>");
+                        $('#tag').append("<div class=\"alert alert-warning\" class=\"flash\">" + '过滤完成，本次共过滤' + data['result'] + '个黑名单号码' + "<a href=\"/download?filename=" + data['content'] + "\"> 点击下载</a>" + "</div>");
+
                     }
                 }
                 else {

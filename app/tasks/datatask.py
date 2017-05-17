@@ -99,3 +99,28 @@ def export_numbers(self):
     export_file.close()
     return {'content': export_file_name, 'status': 'Task completed!','action':'download',
             'result': 0}
+
+@celery.task(bind=True)
+def filter_numbers(self,source_filename, download_filename):
+    filter_count = 0
+    phone_pattern = re.compile('^(86)?((173|177|180|181|189|133|153|170|149)\d{8})$')
+    tel_parttern = re.compile('^((025|0510|0516|0519|0512|0513|0518|0517|0515|0514|0511|0523||0527)?\d{8}$)')
+    source_file = open('./res/' + source_filename, 'r')
+    download_file = open('./res/' + download_filename, 'w+')
+    for item in source_file.readlines():
+        number = filter(str.isdigit, item.strip())
+        match = phone_pattern.match(number)
+        if match:
+            number = match.group(2)
+        else:
+            match = tel_parttern.match(number)
+            if match:
+                number = match.group(1)
+        if number and not BLACKLIST.query.get(number):
+            download_file.write(item)
+        else:
+            filter_count += 1
+    source_file.close()
+    download_file.close()
+    return {'content': download_filename, 'status': 'Task completed!', 'action': 'filter',
+            'result': filter_count}

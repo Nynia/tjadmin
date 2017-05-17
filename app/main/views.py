@@ -7,7 +7,7 @@ from .form import UploadForm, SingleAddForm, FilterForm
 import os, hashlib, time, re, datetime, urllib
 from app import db
 from flask_login import login_required, current_user
-from app.tasks.datatask import datahandle,export_numbers
+from app.tasks.datatask import datahandle,export_numbers,filter_numbers
 
 
 @main.route('/config', methods=['GET'])
@@ -59,6 +59,17 @@ def upload():
     task = datahandle.delay(filenames, type, remark, create_person)
     return jsonify({}), 202, {'Location': url_for('main.taskstatus',
                                                   task_id=task.id)}
+@main.route('/filter', methods=['POST'])
+def filter():
+    sourcefile = request.files['sourcefile']
+    source_filename = hashlib.md5(secure_filename(sourcefile.filename) + str(time.time())).hexdigest()[:15]
+    download_filename = sourcefile.filename[:-4] + '_filtered' + '.txt'
+    print source_filename,download_filename
+    sourcefile.save(os.path.join('./res/', source_filename))
+    task = filter_numbers.delay(source_filename, download_filename)
+    return jsonify({}), 202, {'Location': url_for('main.taskstatus',
+                                                  task_id=task.id)}
+
 @main.route('/status/<task_id>',methods=['GET'])
 def taskstatus(task_id):
     task = datahandle.AsyncResult(task_id)
@@ -162,7 +173,6 @@ def admin():
             download_file.close()
             return redirect(url_for('main.admin', filter=urllib.quote(download_name.encode('utf-8'))))
     elif request.args.get('blacksearch'):
-
         blackitem = BLACKLIST.query.get(request.args.get('blacksearch').strip())
         if not blackitem:
             flash(u'此号码不在黑名单库中')
@@ -182,8 +192,8 @@ def export():
     return jsonify({}), 202, {'Location': url_for('main.taskstatus',
                                                   task_id=task.id)}
 
-@main.route('/download_export', methods=['GET'])
-def download_export():
+@main.route('/download', methods=['GET'])
+def download():
     filename = request.args.get('filename')
     fp = open('./res/' + filename, 'r')
     content = ''
