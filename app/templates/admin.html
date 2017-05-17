@@ -175,10 +175,28 @@
         $('#uploadmodal').modal('show');
     });
     $('#exporttofile').click(function () {
-        window.location.href = '/export'
+        $.ajax({
+            url: '/export',
+            type: 'get',
+            data: {},
+            beforeSend: function () {
+                console.log("正在导出，请稍候");
+            },
+            success: function (data, status, request) {
+                status_url = request.getResponseHeader('Location');
+                console.log(status_url);
+                $('#tag').empty();
+                $('#tag').append("<div class=\"alert alert-warning\" class=\"flash\">" + '正在从数据库导出...' + "</div>");
+                update_progress(status_url);
+            },
+            error: function () {
+                alert('Unexpected error');
+            }
+        });
     });
     $('#filter').click(function () {
         $('#filtermodal').modal('show')
+
     });
     $('#search').click(function () {
         $('#flash').html('');
@@ -250,15 +268,21 @@
             // update UI
             if (data['state'] != 'PENDING' && data['state'] != 'PROGRESS') {
                 if ('result' in data) {
-                    // show result
-
-                    console.log(data['state']);
-                    console.log(data['numbers']);
-                    console.log(data['content']);
-                    $('#tag').empty();
-                    $('#tag').append("<div class=\"alert alert-warning\" class=\"flash\">" + '处理完成' + "</div>");
-                    $('#tag').append("<div class=\"alert alert-warning\" class=\"flash\">" + data['content'] + "</div>");
-               }
+                    if (data['action'] == 'upload') {
+                        console.log(data['state']);
+                        console.log(data['content']);
+                        $('#tag').empty();
+                        $('#tag').append("<div class=\"alert alert-warning\" class=\"flash\">" + '处理完成' + "</div>");
+                        $('#tag').append("<div class=\"alert alert-warning\" class=\"flash\">" + data['content'] + "</div>");
+                    }
+                    else {
+                        console.log(data['state']);
+                        console.log(data['content']);
+                        $('#tag').empty();
+                        $('#tag').append("<div class=\"alert alert-warning\" class=\"flash\">" + '导出完成' + "</div>");
+                        $('#tag').append("<div class=\"alert alert-warning\" class=\"flash\">" + data['content'] + "</div>");
+                    }
+                }
                 else {
                     // something unexpected happened
                     console.log(data['state']);

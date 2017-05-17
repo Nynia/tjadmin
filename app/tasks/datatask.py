@@ -86,5 +86,17 @@ def datahandle(self, filenames, type, remark, create_person):
     print success_count, fail_count, repeat_count
     content = (u'成功导入%d个黑名单号码，重复号码%d个，非法号码%d个') % (success_count, repeat_count, fail_count)
 
-    return {'content': content, 'status': 'Task completed!',
+    return {'content': content, 'status': 'Task completed!','action':'upload',
+            'result': 0}
+
+
+@celery.task(bind=True)
+def export(self):
+    numbers = db.session.query(BLACKLIST.id).all()
+    export_file_name = 'blacklist_' + datetime.datetime.now().strftime('%Y%m%d%H%M%S') + '.txt'
+    export_file = open('./res/' + export_file_name, 'w+')
+    for item in numbers:
+        export_file.write(item[0] + '\n')
+    export_file.close()
+    return {'content': export_file_name, 'status': 'Task completed!','action':'download',
             'result': 0}

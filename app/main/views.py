@@ -178,13 +178,17 @@ def admin():
 
 @main.route('/export', methods=['GET'])
 def export():
-    blacklist = BLACKLIST.query.all()
-    numbers = db.session.query(BLACKLIST.id).all()
-    export_file_name = 'blacklist_' + datetime.datetime.now().strftime('%Y%m%d%H%M%S') + '.txt'
-    # export_file = open('./res/'+export_file_name,'w+')
+    task = export.delay()
+    return jsonify({}), 202, {'Location': url_for('main.taskstatus',
+                                                  task_id=task.id)}
+
+@main.route('/download_export', methods=['GET'])
+def download_export():
+    filename = request.args.get('filename')
+    fp = open(filename,'r')
     content = ''
-    for item in blacklist:
-        content += item.id + '\r\n'
+    for line in fp.readlines():
+        content += line + '\r\n'
     response = make_response(content)
-    response.headers["Content-Disposition"] = "attachment; filename=%s;" % export_file_name
+    response.headers["Content-Disposition"] = "attachment; filename=%s;" % filename
     return response
