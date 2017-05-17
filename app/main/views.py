@@ -188,7 +188,7 @@ def download_export():
     fp = open('./res/' + filename, 'r')
     content = ''
     for line in fp.readlines():
-        content += line + '\r\n'
+        content += line.strip('\n') + '\r\n'
     response = make_response(content)
     response.headers["Content-Disposition"] = "attachment; filename=%s;" % filename
     return response
