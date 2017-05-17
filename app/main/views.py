@@ -162,6 +162,7 @@ def admin():
             download_file.close()
             return redirect(url_for('main.admin', filter=urllib.quote(download_name.encode('utf-8'))))
     elif request.args.get('blacksearch'):
+
         blackitem = BLACKLIST.query.get(request.args.get('blacksearch').strip())
         if not blackitem:
             flash(u'此号码不在黑名单库中')
@@ -178,6 +179,7 @@ def admin():
 @main.route('/export', methods=['GET'])
 def export():
     blacklist = BLACKLIST.query.all()
+    numbers = db.session.query(BLACKLIST.id).all()
     export_file_name = 'blacklist_' + datetime.datetime.now().strftime('%Y%m%d%H%M%S') + '.txt'
     # export_file = open('./res/'+export_file_name,'w+')
     content = ''

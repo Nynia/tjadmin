@@ -74,8 +74,8 @@ def datahandle(self, filenames, type, remark, create_person):
     timestamp = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
     db.session.execute(
         BLACKLIST.__table__.insert().prefix_with('IGNORE'),
-        [{'id': `i`, 'remark': `remark`, 'type': `type`, 'state': '1', 'create_person': `create_person`,
-          'create_mode': '1', 'createtime': `timestamp`} for i in number_list]
+        [{'id': i, 'remark': remark, 'type': type, 'state': '1', 'create_person': create_person,
+          'create_mode': '1', 'createtime': timestamp} for i in number_list]
     )
     db.session.commit()
 
