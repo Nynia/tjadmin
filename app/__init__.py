@@ -3,7 +3,7 @@ from flask_bootstrap import Bootstrap
 from config import config,BaseConfig
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
-from celery import Celery
+from celery import Celery,platforms
 
 bootstrap = Bootstrap()
 db = SQLAlchemy()
@@ -13,7 +13,7 @@ login_manager.session_protection = 'strong'
 login_manager.login_view = 'auth.login'
 
 celery = Celery(__name__,broker=BaseConfig.CELERY_BROKER_URL)
-
+platforms.C_FORCE_ROOT = True
 def create_app(config_name):
     app = Flask(__name__)
     app.config.from_object(config[config_name])
