@@ -196,7 +196,7 @@ def download():
     filename = request.args.get('filename')
     print filename,repr(filename)
     print type(filename)
-    fp = open('../res/' + filename, 'r')
+    fp = open('./res/' + filename, 'r')
     content = ''
     for line in fp.readlines():
         content += line.strip('\n') + '\r\n'
