@@ -7,7 +7,7 @@ from .form import UploadForm, SingleAddForm, FilterForm
 import os, hashlib, time, re, datetime, urllib
 from app import db
 from flask_login import login_required, current_user
-from app.tasks.datatask import datahandle
+from app.tasks.datatask import datahandle,export
 
 
 @main.route('/config', methods=['GET'])
