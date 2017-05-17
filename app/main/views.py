@@ -147,31 +147,6 @@ def admin():
             singleaddform.remark.data = ''
             db.session.commit()
             return redirect(url_for('main.admin'))
-        elif filterform.validate_on_submit():
-            filter_count = 0
-            sourcefile = request.files['sourcefile']
-            filename = hashlib.md5(secure_filename(sourcefile.filename) + str(time.time())).hexdigest()[:15]
-            download_name = sourcefile.filename[:-4] + '_filtered' + '.txt'
-            sourcefile.save(os.path.join('./res/', filename))
-            fp = open('./res/' + filename, 'r')
-            download_file = open('./res/' + download_name, 'w+')
-            for item in fp.readlines():
-                number = filter(str.isdigit, item.strip())
-                match = phone_pattern.match(number)
-                if match:
-                    number = match.group(2)
-                else:
-                    match = tel_parttern.match(number)
-                    if match:
-                        number = match.group(1)
-                if not BLACKLIST.query.get(number):
-                    download_file.write(item)
-                else:
-                    filter_count += 1
-            flash(u'过滤成功，共过滤黑名单号码%d个' % filter_count)
-            fp.close()
-            download_file.close()
-            return redirect(url_for('main.admin', filter=urllib.quote(download_name.encode('utf-8'))))
     elif request.args.get('blacksearch'):
         blackitem = BLACKLIST.query.get(request.args.get('blacksearch').strip())
         if not blackitem:
