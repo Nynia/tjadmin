@@ -39,7 +39,7 @@ def root():
 
 
 @main.route('/upload', methods=['POST'])
-def upload():
+def upload_black():
     print request.url
     print request.remote_addr
     create_person = BlACKUSER.query.get(int(current_user.id)).username
@@ -60,7 +60,7 @@ def upload():
     return jsonify({}), 202, {'Location': url_for('main.taskstatus',
                                                   task_id=task.id)}
 @main.route('/filter', methods=['POST'])
-def filter():
+def filter_black():
     sourcefile = request.files['sourcefile']
     source_filename = hashlib.md5(secure_filename(sourcefile.filename) + str(time.time())).hexdigest()[:15]
     download_filename = sourcefile.filename[:-4] + '_filtered' + '.txt'
