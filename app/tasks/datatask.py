@@ -10,7 +10,7 @@ def datahandle(self, filenames, type, remark, create_person):
     success_count = 0
     fail_count = 0
     repeat_count = 0
-
+    number_list = []
     phone_pattern = re.compile('^(86)?((173|177|180|181|189|133|153|170|149)\d{8})$')
     tel_parttern = re.compile('^((025|0510|0516|0519|0512|0513|0518|0517|0515|0514|0511|0523||0527)?\d{8}$)')
     number_parttern = re.compile('\d{8,13}')
@@ -34,7 +34,7 @@ def datahandle(self, filenames, type, remark, create_person):
         filename = './res/' + filename
         print filename
         if filename[-3:] == 'txt':
-            fp = open(filename,'r')
+            fp = open(filename, 'r')
             for number in fp.readlines():
                 number = filter(str.isdigit, str(number.strip()))
                 match = phone_pattern.match(number)
@@ -48,16 +48,18 @@ def datahandle(self, filenames, type, remark, create_person):
                         fail_count += 1
                         continue
                 if not BLACKLIST.query.get(number):
-                    blackitem = BLACKLIST()
-                    blackitem.id = number
-                    blackitem.createtime = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
-                    blackitem.state = '1'
-                    blackitem.type = type
-                    blackitem.remark = remark if remark else u'无'
-                    blackitem.create_person = create_person
-                    blackitem.create_mode = '1'
-                    db.session.add(blackitem)
+                    number_list.append(number)
                     success_count += 1
+                    # blackitem = BLACKLIST()
+                    # blackitem.id = number
+                    # blackitem.createtime = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
+                    # blackitem.state = '1'
+                    # blackitem.type = type
+                    # blackitem.remark = remark if remark else u'无'
+                    # blackitem.create_person = create_person
+                    # blackitem.create_mode = '1'
+                    # db.session.add(blackitem)
+                    # success_count += 1
                 else:
                     repeat_count += 1
             fp.close()
@@ -83,18 +85,26 @@ def datahandle(self, filenames, type, remark, create_person):
                                     fail_count += 1
                                     continue
                             if not BLACKLIST.query.get(number):
-                                blackitem = BLACKLIST()
-                                blackitem.id = number
-                                blackitem.createtime = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
-                                blackitem.state = '1'
-                                blackitem.type = type
-                                blackitem.remark = remark if remark else u'无'
-                                blackitem.create_person = create_person
-                                blackitem.create_mode = '2'
-                                db.session.add(blackitem)
+                                number_list.append(number)
                                 success_count += 1
+                                # blackitem = BLACKLIST()
+                                # blackitem.id = number
+                                # blackitem.createtime = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
+                                # blackitem.state = '1'
+                                # blackitem.type = type
+                                # blackitem.remark = remark if remark else u'无'
+                                # blackitem.create_person = create_person
+                                # blackitem.create_mode = '1'
+                                # db.session.add(blackitem)
+                                # success_count += 1
                             else:
                                 repeat_count += 1
+    timestamp = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
+    db.session.execute(
+        BLACKLIST.__table__.insert(),
+        [{'id': `i`, 'remark': `remark`, 'type': `type`, 'state': '1', 'create_person': `create_person`,
+          'create_mode': '1', 'createtime': `timestamp`} for i in number_list]
+    )
     db.session.commit()
 
     print success_count, fail_count, repeat_count
