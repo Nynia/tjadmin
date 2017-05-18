@@ -86,7 +86,7 @@ def datahandle(self, filenames, type, remark, create_person):
     content = (u'成功导入%d个黑名单号码，重复号码%d个，非法号码%d个') % (success_count, repeat_count, fail_count)
 
     return {'content': content, 'status': 'Task completed!','action':'upload',
-            'result': 0}
+            'result': count_after}
 
 
 @celery.task(bind=True)

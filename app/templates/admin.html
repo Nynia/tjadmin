@@ -119,7 +119,7 @@
             </span>
         </div>
     </div>
-    <p><strong>当前库中共有{{ totalcount }}个黑名单号码</strong></p>
+    <p>当前库中共有<strong>{{ totalcount }}</strong>个黑名单号码</p>
     <div id="tag">
         {% for message in get_flashed_messages() %}
             <div class="alert alert-warning" class="flash">
@@ -298,10 +298,10 @@
                     if (data['action'] == 'upload') {
                         console.log(data['state']);
                         console.log(data['content']);
-                        location.reload();
                         $('#tag').empty();
                         $('#tag').append("<div class=\"alert alert-warning\" class=\"flash\">" + '导入完成' + "</div>");
                         $('#tag').append("<div class=\"alert alert-warning\" class=\"flash\">" + data['content'] + "</div>");
+                        $('strong').text(data['result']);
                     }
                     else if (data['action'] == 'export') {
                         console.log(data['state']);
