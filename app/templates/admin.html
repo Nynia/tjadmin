@@ -230,7 +230,7 @@
                 status_url = request.getResponseHeader('Location');
                 console.log(status_url);
                 $('#tag').empty();
-                $('#tag').append("<div class=\"alert alert-warning\" class=\"flash\">" + '正在处理...' + "</div>");
+                $('#tag').append("<div class=\"alert alert-warning\" class=\"flash\">" + '正在导入...' + "</div>");
                 update_progress(status_url);
             },
             error: function () {
@@ -298,8 +298,9 @@
                     if (data['action'] == 'upload') {
                         console.log(data['state']);
                         console.log(data['content']);
+                        location.reload();
                         $('#tag').empty();
-                        $('#tag').append("<div class=\"alert alert-warning\" class=\"flash\">" + '处理完成' + "</div>");
+                        $('#tag').append("<div class=\"alert alert-warning\" class=\"flash\">" + '导入完成' + "</div>");
                         $('#tag').append("<div class=\"alert alert-warning\" class=\"flash\">" + data['content'] + "</div>");
                     }
                     else if (data['action'] == 'export') {
