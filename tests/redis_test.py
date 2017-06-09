@@ -1,5 +1,6 @@
-from app import redisClient
 import datetime
+import redis
+redisClient = redis.StrictRedis(host='localhost',port=6379,db=2)
 
 for i in range(1000,9999):
     redisClient.hset(str(i), "id", i)
