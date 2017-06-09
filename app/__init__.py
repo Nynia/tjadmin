@@ -5,13 +5,11 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from celery import Celery,platforms
 bootstrap = Bootstrap()
+
 db = SQLAlchemy()
 login_manager = LoginManager()
 login_manager.session_protection = 'strong'
 login_manager.login_view = 'auth.login'
-
-import redis
-redisClient = redis.StrictRedis(host='localhost',port=6379,db=2)
 
 celery = Celery(__name__,broker=BaseConfig.CELERY_BROKER_URL)
 platforms.C_FORCE_ROOT = True
