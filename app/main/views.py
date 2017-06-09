@@ -149,7 +149,9 @@ def admin():
                 return redirect(url_for('main.admin'))
         elif request.args.get('blacksearch'):
             number = request.args.get('blacksearch').strip()
+            print number
             if not redisClient.hexists(number,'id'):
+                print 'not exist %s' % number
                 flash(u'此号码不在黑名单库中')
             else:
                 createtime = redisClient.hget(number, 'createtime')
