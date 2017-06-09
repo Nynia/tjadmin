@@ -125,7 +125,7 @@ def filter_numbers(self,source_filename, download_filename):
             match = tel_parttern.match(number)
             if match:
                 number = match.group(1)
-        if number and not BLACKLIST.query.get(number):
+        if number and not redisClient.hexists('index',number):
             download_file.write(item)
         else:
             filter_count += 1
