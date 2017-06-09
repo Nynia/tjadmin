@@ -63,7 +63,7 @@ def datahandle(self, filenames, type, remark, create_person):
                                 match = tel_parttern.match(number)
                                 if match:
                                     number = match.group(1)
-                                    if len(number) == 8:
+                                    if len(number) == 8 and len(areano) > 0:
                                         number = areano + number
                                 else:
                                     fail_count += 1
@@ -74,7 +74,7 @@ def datahandle(self, filenames, type, remark, create_person):
     db.session.execute(
         BLACKLIST.__table__.insert().prefix_with('IGNORE'),
         [{'id': i, 'remark': remark, 'type': type, 'state': '1', 'create_person': create_person,
-          'create_mode': '1', 'createtime': timestamp} for i in number_list]
+          'create_mode': '2', 'createtime': timestamp} for i in number_list]
     )
     db.session.commit()
 

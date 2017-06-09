@@ -4,7 +4,6 @@ from config import config,BaseConfig
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from celery import Celery,platforms
-
 bootstrap = Bootstrap()
 db = SQLAlchemy()
 

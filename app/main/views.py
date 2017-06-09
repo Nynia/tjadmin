@@ -104,11 +104,9 @@ def admin():
     if current_user.is_anonymous:
         return redirect(url_for('auth.login'))
     singleaddform = SingleAddForm()
-    filterform = FilterForm()
     blackitem = None
     totalcount = BLACKLIST.query.count()
     if request.method == 'POST':
-        print request.url
         phone_pattern = re.compile('(86)?((173|177|180|181|189|133|153|170|149)\d{8}$)')
         tel_parttern = re.compile('^(0(25|510|516|519|512|513|518|517|515|514|511|523||527)\d{8}$)')
         create_person = BlACKUSER.query.get(int(current_user.id)).username
@@ -142,7 +140,6 @@ def admin():
                     success_count += 1
                 else:
                     repeat_count += 1
-                    # flash(u'%s 已存在，请不要重复添加' % number)
             flash((u'成功添加%d个黑名单号码，重复号码%d个，非法号码%d个') % (success_count, repeat_count, fail_count))
             singleaddform.number.data = ''
             singleaddform.remark.data = ''
