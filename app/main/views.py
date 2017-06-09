@@ -156,9 +156,10 @@ def admin():
             createtime = redisClient.hget(number, 'createtime')
             state = redisClient.hget(number, 'state')
             type = redisClient.hget(number, 'type')
-            remark = ''
+            remark = redisClient.hget(number, 'remark').encode('utf-8')
             create_person = redisClient.hget(number, 'create_person')
             create_mode = redisClient.hget(number, 'create_mode')
+            print repr(remark)
             blackinfo = BlackInfo(number, remark, type, createtime, state, create_person, create_mode)
     elif request.args.get('filter'):  # print repr(str(request.args.get('filter')))
         filename = urllib.unquote(str(request.args.get('filter')))
