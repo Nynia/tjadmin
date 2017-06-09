@@ -132,7 +132,7 @@ def admin():
                     else:
                         fail_count += 1
                         continue
-                if not redisClient.hget(number):
+                if not redisClient.hexists(number,'id'):
                     redisClient.hset(number, 'id', number)
                     redisClient.hset(number, 'createtime', datetime.datetime.now().strftime('%Y%m%d%H%M%S'))
                     redisClient.hset(number, 'state', '1')
@@ -141,7 +141,6 @@ def admin():
                     redisClient.hset(number, 'create_person', create_person)
                     redisClient.hset(number, 'create_mode', '1')
                     success_count += 1
-
                 else:
                     repeat_count += 1
                 flash((u'成功添加%d个黑名单号码，重复号码%d个，非法号码%d个') % (success_count, repeat_count, fail_count))
@@ -150,15 +149,16 @@ def admin():
                 return redirect(url_for('main.admin'))
         elif request.args.get('blacksearch'):
             number = request.args.get('blacksearch').strip()
-            createtime = redisClient.hget(number, 'createtime')
-            state = redisClient.hget(number, 'state')
-            type = redisClient.hget(number, 'type')
-            remark = redisClient.hget(number, 'remark')
-            create_person = redisClient.hget(number, 'create_person')
-            create_mode = redisClient.hget(number, 'create_mode')
-            blackinfo = BlackInfo(number, remark, type,createtime, state, create_person, create_mode)
-            if not blackitem:
+            if not redisClient.hexists(number,'id'):
                 flash(u'此号码不在黑名单库中')
+            else:
+                createtime = redisClient.hget(number, 'createtime')
+                state = redisClient.hget(number, 'state')
+                type = redisClient.hget(number, 'type')
+                remark = redisClient.hget(number, 'remark')
+                create_person = redisClient.hget(number, 'create_person')
+                create_mode = redisClient.hget(number, 'create_mode')
+                blackinfo = BlackInfo(number, remark, type, createtime, state, create_person, create_mode)
         elif request.args.get('filter'):  # print repr(str(request.args.get('filter')))
             filename = urllib.unquote(str(request.args.get('filter')))
             filter_path = '..' + os.sep + 'res' + os.sep + filename.decode('utf-8')
