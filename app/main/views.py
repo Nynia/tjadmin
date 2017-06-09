@@ -147,26 +147,25 @@ def admin():
                 singleaddform.number.data = ''
                 singleaddform.remark.data = ''
                 return redirect(url_for('main.admin'))
-        elif request.args.get('blacksearch'):
-            number = request.args.get('blacksearch').strip()
-            print number
-            if not redisClient.hexists(number,'id'):
-                print 'not exist %s' % number
-                flash(u'此号码不在黑名单库中')
-            else:
-                createtime = redisClient.hget(number, 'createtime')
-                state = redisClient.hget(number, 'state')
-                type = redisClient.hget(number, 'type')
-                remark = redisClient.hget(number, 'remark')
-                create_person = redisClient.hget(number, 'create_person')
-                create_mode = redisClient.hget(number, 'create_mode')
-                blackinfo = BlackInfo(number, remark, type, createtime, state, create_person, create_mode)
-        elif request.args.get('filter'):  # print repr(str(request.args.get('filter')))
-            filename = urllib.unquote(str(request.args.get('filter')))
-            filter_path = '..' + os.sep + 'res' + os.sep + filename.decode('utf-8')
-            response = make_response(send_file(filter_path))
-            response.headers["Content-Disposition"] = "attachment; filename=%s;" % filename
-            return response
+    elif request.args.get('blacksearch'):
+        number = request.args.get('blacksearch').strip()
+        if not redisClient.hexists(number,'id'):
+            print 'not exist %s' % number
+            flash(u'此号码不在黑名单库中')
+        else:
+            createtime = redisClient.hget(number, 'createtime')
+            state = redisClient.hget(number, 'state')
+            type = redisClient.hget(number, 'type')
+            remark = redisClient.hget(number, 'remark')
+            create_person = redisClient.hget(number, 'create_person')
+            create_mode = redisClient.hget(number, 'create_mode')
+            blackinfo = BlackInfo(number, remark, type, createtime, state, create_person, create_mode)
+    elif request.args.get('filter'):  # print repr(str(request.args.get('filter')))
+        filename = urllib.unquote(str(request.args.get('filter')))
+        filter_path = '..' + os.sep + 'res' + os.sep + filename.decode('utf-8')
+        response = make_response(send_file(filter_path))
+        response.headers["Content-Disposition"] = "attachment; filename=%s;" % filename
+        return response
     return render_template('admin.html', singleaddform=singleaddform, blackitem=blackinfo, totalcount=totalcount)
 
 
