@@ -5,9 +5,10 @@ from flask import render_template, request, flash, make_response, redirect, url_
 from werkzeug.utils import secure_filename
 from .form import UploadForm, SingleAddForm, FilterForm
 import os, hashlib, time, re, datetime, urllib
-from app import db
+from app import redisClient
+from app.entity import BlackInfo
 from flask_login import login_required, current_user
-from app.tasks.datatask import datahandle,export_numbers,filter_numbers
+from app.tasks.datatask import datahandle, export_numbers, filter_numbers
 
 
 @main.route('/config', methods=['GET'])
@@ -51,26 +52,29 @@ def upload_black():
     for file in request.files.getlist('blackfile'):
         suffix = file.filename[file.filename.rindex('.'):]
         print suffix
-        if suffix not in ['.txt','.csv','.xls','.xlsx']:
+        if suffix not in ['.txt', '.csv', '.xls', '.xlsx']:
             continue
-        filename = hashlib.md5(secure_filename(file.filename) + str(time.time())).hexdigest()[:15]+suffix
+        filename = hashlib.md5(secure_filename(file.filename) + str(time.time())).hexdigest()[:15] + suffix
         file.save(os.path.join('./res/', filename))
         filenames.append(filename)
     task = datahandle.delay(filenames, type, remark, create_person)
     return jsonify({}), 202, {'Location': url_for('main.taskstatus',
                                                   task_id=task.id)}
+
+
 @main.route('/filter', methods=['POST'])
 def filter_black():
     sourcefile = request.files['sourcefile']
     source_filename = hashlib.md5(secure_filename(sourcefile.filename) + str(time.time())).hexdigest()[:15]
     download_filename = sourcefile.filename[:-4] + '_filtered' + '.txt'
-    print source_filename,download_filename
+    print source_filename, download_filename
     sourcefile.save(os.path.join('./res/', source_filename))
     task = filter_numbers.delay(source_filename, download_filename)
     return jsonify({}), 202, {'Location': url_for('main.taskstatus',
                                                   task_id=task.id)}
 
-@main.route('/status/<task_id>',methods=['GET'])
+
+@main.route('/status/<task_id>', methods=['GET'])
 def taskstatus(task_id):
     task = datahandle.AsyncResult(task_id)
     if task.state == 'PENDING':
@@ -85,7 +89,7 @@ def taskstatus(task_id):
             'state': task.state,
             'content': task.info.get('content', ''),
             'status': task.info.get('status', ''),
-            'action':task.info.get('action','')
+            'action': task.info.get('action', '')
         }
         if 'result' in task.info:
             response['result'] = task.info['result']
@@ -99,13 +103,14 @@ def taskstatus(task_id):
         }
     return jsonify(response)
 
+
 @main.route('/admin', methods=['GET', 'POST'])
 def admin():
     if current_user.is_anonymous:
         return redirect(url_for('auth.login'))
     singleaddform = SingleAddForm()
-    blackitem = None
-    totalcount = BLACKLIST.query.count()
+    blackinfo = None
+    totalcount = redisClient.dbsize()
     if request.method == 'POST':
         phone_pattern = re.compile('(86)?((173|177|180|181|189|133|153|170|149)\d{8}$)')
         tel_parttern = re.compile('^(0(25|510|516|519|512|513|518|517|515|514|511|523||527)\d{8}$)')
@@ -127,36 +132,41 @@ def admin():
                     else:
                         fail_count += 1
                         continue
-                if not BLACKLIST.query.get(number):
-                    blackitem = BLACKLIST()
-                    blackitem.id = number
-                    blackitem.createtime = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
-                    blackitem.state = '1'
-                    blackitem.type = '1' if singleaddform.type.data == 'black' else '2'
-                    blackitem.remark = singleaddform.remark.data if singleaddform.remark.data else u'无'
-                    blackitem.create_person = create_person
-                    blackitem.create_mode = '1'
-                    db.session.add(blackitem)
+                if not redisClient.hget(number):
+                    redisClient.hset(number, 'id', number)
+                    redisClient.hset(number, 'createtime', datetime.datetime.now().strftime('%Y%m%d%H%M%S'))
+                    redisClient.hset(number, 'state', '1')
+                    redisClient.hset(number, 'type', '1' if singleaddform.type.data == 'black' else '2')
+                    redisClient.hset(number, 'remark', singleaddform.remark.data if singleaddform.remark.data else u'无')
+                    redisClient.hset(number, 'create_person', create_person)
+                    redisClient.hset(number, 'create_mode', '1')
                     success_count += 1
+
                 else:
                     repeat_count += 1
-            flash((u'成功添加%d个黑名单号码，重复号码%d个，非法号码%d个') % (success_count, repeat_count, fail_count))
-            singleaddform.number.data = ''
-            singleaddform.remark.data = ''
-            db.session.commit()
-            return redirect(url_for('main.admin'))
-    elif request.args.get('blacksearch'):
-        blackitem = BLACKLIST.query.get(request.args.get('blacksearch').strip())
-        if not blackitem:
-            flash(u'此号码不在黑名单库中')
-    elif request.args.get('filter'):
-        # print repr(str(request.args.get('filter')))
-        filename = urllib.unquote(str(request.args.get('filter')))
-        filter_path = '..' + os.sep + 'res' + os.sep + filename.decode('utf-8')
-        response = make_response(send_file(filter_path))
-        response.headers["Content-Disposition"] = "attachment; filename=%s;" % filename
-        return response
-    return render_template('admin.html',singleaddform=singleaddform,blackitem=blackitem, totalcount=totalcount)
+                flash((u'成功添加%d个黑名单号码，重复号码%d个，非法号码%d个') % (success_count, repeat_count, fail_count))
+                singleaddform.number.data = ''
+                singleaddform.remark.data = ''
+                return redirect(url_for('main.admin'))
+        elif request.args.get('blacksearch'):
+            number = request.args.get('blacksearch').strip()
+            createtime = redisClient.hget(number, 'createtime')
+            state = redisClient.hget(number, 'state')
+            type = redisClient.hget(number, 'type')
+            remark = redisClient.hget(number, 'remark')
+            create_person = redisClient.hget(number, 'create_person')
+            create_mode = redisClient.hget(number, 'create_mode')
+            blackinfo = BlackInfo(number, remark, type,createtime, state, create_person, create_mode)
+            if not blackitem:
+                flash(u'此号码不在黑名单库中')
+        elif request.args.get('filter'):  # print repr(str(request.args.get('filter')))
+            filename = urllib.unquote(str(request.args.get('filter')))
+            filter_path = '..' + os.sep + 'res' + os.sep + filename.decode('utf-8')
+            response = make_response(send_file(filter_path))
+            response.headers["Content-Disposition"] = "attachment; filename=%s;" % filename
+            return response
+    return render_template('admin.html', singleaddform=singleaddform, blackitem=blackinfo, totalcount=totalcount)
+
 
 @main.route('/export', methods=['GET'])
 def export():
@@ -164,10 +174,11 @@ def export():
     return jsonify({}), 202, {'Location': url_for('main.taskstatus',
                                                   task_id=task.id)}
 
+
 @main.route('/download', methods=['GET'])
 def download():
     filename = request.args.get('filename')
-    print filename,repr(filename)
+    print filename, repr(filename)
     fp = open('./res/' + filename, 'r')
     content = ''
     for line in fp.readlines():

@@ -6,6 +6,9 @@ from flask_login import LoginManager
 from celery import Celery,platforms
 bootstrap = Bootstrap()
 
+import redis
+redisClient = redis.StrictRedis(host='localhost',port=6379,db=2)
+
 db = SQLAlchemy()
 login_manager = LoginManager()
 login_manager.session_protection = 'strong'
