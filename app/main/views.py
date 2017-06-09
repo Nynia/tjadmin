@@ -156,7 +156,7 @@ def admin():
             createtime = redisClient.hget(number, 'createtime')
             state = redisClient.hget(number, 'state')
             type = redisClient.hget(number, 'type')
-            remark = redisClient.hget(number, 'remark')
+            remark = redisClient.hget(number, 'remark').encode('utf-8')
             create_person = redisClient.hget(number, 'create_person')
             create_mode = redisClient.hget(number, 'create_mode')
             blackinfo = BlackInfo(number, remark, type, createtime, state, create_person, create_mode)
