@@ -1,5 +1,5 @@
 # -*-coding=utf-8-*-
-from app import celery
+from app import celery,db,redisClient
 from app.models import BLACKLIST
 import re, datetime
 from pyexcel_xls import get_data
@@ -8,6 +8,7 @@ from pyexcel_xls import get_data
 def datahandle(self, filenames, type, remark, create_person):
     success_count = 0
     fail_count = 0
+    repeat_count = 0
     number_list = []
     phone_pattern = re.compile('^(86)?((173|177|180|181|189|133|153|170|149)\d{8})$')
     tel_parttern = re.compile('^((025|0510|0516|0519|0512|0513|0518|0517|0515|0514|0511|0523||0527)?\d{8}$)')
@@ -45,7 +46,7 @@ def datahandle(self, filenames, type, remark, create_person):
                         fail_count += 1
                         continue
                 number_list.append(number)
-                success_count += 1
+                #success_count += 1
             fp.close()
         else:
             xls_data = get_data(filename)
@@ -69,18 +70,23 @@ def datahandle(self, filenames, type, remark, create_person):
                                     fail_count += 1
                                     continue
                             number_list.append(number)
-                            success_count += 1
+                            #success_count += 1
     timestamp = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
-    db.session.execute(
-        BLACKLIST.__table__.insert().prefix_with('IGNORE'),
-        [{'id': i, 'remark': remark, 'type': type, 'state': '1', 'create_person': create_person,
-          'create_mode': '2', 'createtime': timestamp} for i in number_list]
-    )
-    db.session.commit()
 
-    count_after = BLACKLIST.query.count()
-    repeat_count = success_count - (count_after-count_before)
-    success_count = count_after - count_before
+    for number in number_list:
+        if redisClient.hexists(number, 'id'):
+            redisClient.hset(number, 'id', number)
+            redisClient.hset(number, 'createtime',timestamp)
+            redisClient.hset(number, 'state', '1')
+            redisClient.hset(number, 'type', type )
+            redisClient.hset(number, 'remark', remark)
+            redisClient.hset(number, 'create_person', create_person)
+            redisClient.hset(number, 'create_mode', '2')
+            success_count += 1
+        else:
+            repeat_count += 1
+
+    count_after = redisClient.dbsize()
 
     print success_count, fail_count, repeat_count
     content = (u'成功导入%d个黑名单号码，重复号码%d个，非法号码%d个') % (success_count, repeat_count, fail_count)

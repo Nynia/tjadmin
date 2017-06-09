@@ -159,7 +159,6 @@ def admin():
             remark = redisClient.hget(number, 'remark').decode('utf-8')
             create_person = redisClient.hget(number, 'create_person')
             create_mode = redisClient.hget(number, 'create_mode')
-            print repr(remark)
             blackinfo = BlackInfo(number, remark, type, createtime, state, create_person, create_mode)
     elif request.args.get('filter'):  # print repr(str(request.args.get('filter')))
         filename = urllib.unquote(str(request.args.get('filter')))
@@ -175,7 +174,6 @@ def export():
     task = export_numbers.delay()
     return jsonify({}), 202, {'Location': url_for('main.taskstatus',
                                                   task_id=task.id)}
-
 
 @main.route('/download', methods=['GET'])
 def download():
