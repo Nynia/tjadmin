@@ -74,7 +74,7 @@ def datahandle(self, filenames, type, remark, create_person):
     timestamp = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
 
     for number in number_list:
-        if redisClient.hexists(number, 'id'):
+        if not redisClient.hexists(number, 'id'):
             redisClient.hset(number, 'id', number)
             redisClient.hset(number, 'createtime',timestamp)
             redisClient.hset(number, 'state', '1')
