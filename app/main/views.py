@@ -110,7 +110,7 @@ def admin():
         return redirect(url_for('auth.login'))
     singleaddform = SingleAddForm()
     blackinfo = None
-    totalcount = redisClient.dbsize()
+    totalcount = redisClient.hlen('index')
     if request.method == 'POST':
         phone_pattern = re.compile('(86)?((173|177|180|181|189|133|153|170|149)\d{8}$)')
         tel_parttern = re.compile('^(0(25|510|516|519|512|513|518|517|515|514|511|523||527)\d{8}$)')
@@ -132,7 +132,7 @@ def admin():
                     else:
                         fail_count += 1
                         continue
-                if not redisClient.hexists(number,'id'):
+                if not redisClient.hexists('index', number) :
                     redisClient.hset(number, 'id', number)
                     redisClient.hset(number, 'createtime', datetime.datetime.now().strftime('%Y%m%d%H%M%S'))
                     redisClient.hset(number, 'state', '1')
@@ -140,6 +140,8 @@ def admin():
                     redisClient.hset(number, 'remark', singleaddform.remark.data if singleaddform.remark.data else u'无')
                     redisClient.hset(number, 'create_person', create_person)
                     redisClient.hset(number, 'create_mode', '1')
+
+                    redisClient.hset('index',number,True)
                     success_count += 1
                 else:
                     repeat_count += 1
@@ -149,7 +151,7 @@ def admin():
                 return redirect(url_for('main.admin'))
     elif request.args.get('blacksearch'):
         number = request.args.get('blacksearch').strip()
-        if not redisClient.hexists(number,'id'):
+        if not redisClient.hexists('index',number):
             print 'not exist %s' % number
             flash(u'此号码不在黑名单库中')
         else:

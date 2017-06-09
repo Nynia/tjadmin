@@ -28,7 +28,6 @@ def datahandle(self, filenames, type, remark, create_person):
         u'泰州': '0523',
         u'宿迁': '0527'
     }
-    count_before = BLACKLIST.query.count()
     for filename in filenames:
         filename = './res/' + filename
         if filename[-3:] == 'txt':
@@ -74,7 +73,7 @@ def datahandle(self, filenames, type, remark, create_person):
     timestamp = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
 
     for number in number_list:
-        if not redisClient.hexists(number, 'id'):
+        if not redisClient.hexists('index', number):
             redisClient.hset(number, 'id', number)
             redisClient.hset(number, 'createtime',timestamp)
             redisClient.hset(number, 'state', '1')
@@ -82,11 +81,13 @@ def datahandle(self, filenames, type, remark, create_person):
             redisClient.hset(number, 'remark', remark)
             redisClient.hset(number, 'create_person', create_person)
             redisClient.hset(number, 'create_mode', '2')
+
+            redisClient.hset('index', number, True)
             success_count += 1
         else:
             repeat_count += 1
 
-    count_after = redisClient.dbsize()
+    count_after = redisClient.hlen('index')
 
     print success_count, fail_count, repeat_count
     content = (u'成功导入%d个黑名单号码，重复号码%d个，非法号码%d个') % (success_count, repeat_count, fail_count)
@@ -97,7 +98,9 @@ def datahandle(self, filenames, type, remark, create_person):
 
 @celery.task(bind=True)
 def export_numbers(self):
-    numbers = db.session.query(BLACKLIST.id).all()
+    numbers = []
+    for number in redisClient.hkeys('index'):
+        numbers.append(number)
     export_file_name = 'blacklist_' + datetime.datetime.now().strftime('%Y%m%d%H%M%S') + '.txt'
     export_file = open('./res/' + export_file_name, 'w+')
     for item in numbers:
