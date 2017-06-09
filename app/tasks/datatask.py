@@ -1,5 +1,5 @@
 # -*-coding=utf-8-*-
-from app import celery, db
+from app import celery
 from app.models import BLACKLIST
 import re, datetime
 from pyexcel_xls import get_data
