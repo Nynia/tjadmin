@@ -100,7 +100,7 @@ def datahandle(self, filenames, type, remark, create_person):
 def export_numbers(self):
     numbers = []
     for number in redisClient.hkeys('index'):
-        numbers.append(number)
+        numbers.append(redisClient.hget(number,'id'))
     export_file_name = 'blacklist_' + datetime.datetime.now().strftime('%Y%m%d%H%M%S') + '.txt'
     export_file = open('./res/' + export_file_name, 'w+')
     for item in numbers:
