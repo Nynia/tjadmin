@@ -40,6 +40,8 @@ def datahandle(self, filenames, type, remark, create_person):
                     match = tel_parttern.match(number)
                     if match:
                         number = match.group(1)
+                        if len(number) == 8 and len(areano) > 0:
+                            number = areano + number
                     else:
                         fail_count += 1
                         continue
