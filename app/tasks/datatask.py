@@ -103,8 +103,7 @@ def export_numbers(self):
         numbers.append(redisClient.hget(number,'id'))
     export_file_name = 'blacklist_' + datetime.datetime.now().strftime('%Y%m%d%H%M%S') + '.txt'
     export_file = open('./res/' + export_file_name, 'w+')
-    for item in numbers:
-        export_file.write(item[0] + '\n')
+    export_file.write('\n'.join(numbers))
     export_file.close()
     return {'content': export_file_name, 'status': 'Task completed!','action':'export',
             'result': 0}
