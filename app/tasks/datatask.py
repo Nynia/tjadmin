@@ -1,6 +1,5 @@
 # -*-coding=utf-8-*-
-from app import celery,db,redisClient
-from app.models import BLACKLIST
+from app import celery,redisClient
 import re, datetime
 from pyexcel_xls import get_data
 
@@ -100,6 +99,7 @@ def datahandle(self, filenames, type, remark, create_person):
 def export_numbers(self):
     numbers = []
     for number in redisClient.hkeys('index'):
+        print number,redisClient.hget(number,'id')
         numbers.append(redisClient.hget(number,'id'))
     export_file_name = 'blacklist_' + datetime.datetime.now().strftime('%Y%m%d%H%M%S') + '.txt'
     export_file = open('./res/' + export_file_name, 'w+')
